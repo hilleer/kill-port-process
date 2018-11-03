@@ -7,13 +7,13 @@
 ```javascript
 const killPortProcesses = require('kill-port-process');
 
-(async () => {
+module.export.main = () => {
 	try {
 		await processKill([4001, 4002]);
 	} catch (error) {
 		throw error;
 	}
-})();
+};
 ```
 
 ## Todo
