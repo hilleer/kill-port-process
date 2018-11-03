@@ -9,11 +9,11 @@
 ## Usage
 
 ```javascript
-const killPortProcesses = require('kill-port-process');
+const killPortProcess = require('kill-port-process');
 
 module.export.main = () => {
 	try {
-		await processKill([4001, 4002]);
+		await killPortProcess([4001, 4002]);
 	} catch (error) {
 		throw error;
 	}
