@@ -1,4 +1,4 @@
-const processKill = require('./index');
+const processKill = require('./src/index');
 
 
 (async () => {
