@@ -1,5 +1,7 @@
 # Kill-port-process
 
+[![NPM](https://nodei.co/npm/kill-port-process.png?compact=true)](https://nodei.co/npm/kill-port-process/)
+
 **Cross-platform** module to stop a process running on a port.
 
 ## Usage
