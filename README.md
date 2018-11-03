@@ -13,7 +13,7 @@ const killPortProcess = require('kill-port-process');
 
 module.export.main = () => {
 	try {
-		await killPortProcess([4001, 4002]);
+		await killPortProcess([4001, 4002]); // takes a number or a number[]
 	} catch (error) {
 		throw error;
 	}
