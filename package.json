@@ -1,8 +1,9 @@
 {
   "name": "kill-port-process",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "module to delete process running on a specific port",
-  "main": "src/index.js",
+  "main": "./index.js",
+  "typings": "index.d.ts",
   "scripts": {
     "test": "mocha"
   },

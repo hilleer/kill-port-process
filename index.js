@@ -20,6 +20,7 @@ module.exports = async (input, opts = {}) => {
 	} catch (error) {
 		throw error;
 	}
+	return;
 };
 
 
