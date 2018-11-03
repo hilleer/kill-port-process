@@ -22,6 +22,5 @@ module.export.main = () => {
 
 ## Todo
 
-### Add tests
-
-### Clean up
+* Add tests
+* Clean up
