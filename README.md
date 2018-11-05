@@ -23,4 +23,5 @@ module.export.main = async () => {
 ## Todo
 
 * Add tests
+* Add test build
 * Clean up
