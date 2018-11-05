@@ -11,7 +11,7 @@
 ```javascript
 const killPortProcess = require('kill-port-process');
 
-module.export.main = () => {
+module.export.main = async () => {
 	try {
 		await killPortProcess([4001, 4002]); // takes a number or a number[]
 	} catch (error) {
