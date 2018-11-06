@@ -4,7 +4,7 @@
 
 [![npm version](https://badge.fury.io/js/kill-port-process.svg)](https://badge.fury.io/js/kill-port-process)
 
-**Cross-platform** module to stop a process running on a port.
+**Cross-platform** module to stop one (or more) process(es) running on a port (or a list of ports).
 
 ## Usage
 
