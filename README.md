@@ -23,5 +23,6 @@ module.export.main = async () => {
 ## Todo
 
 * Add tests
-* Add test build
+* Add test build (travis)
+* Add cli command
 * Clean up
