@@ -6,14 +6,11 @@ const { arrayifyInput, validateInput } = require('./utils');
 
 module.exports = async (input, opts = {}) => {
 	try {
-		console.log('input first: ', input);
 		validateInput(input);
 
 		opts = mergeOpts(opts);
 
 		const inputArray = arrayifyInput(input);
-
-		console.log('input array: ', inputArray);
 
 		switch (os.platform()) {
 			case 'win32':
