@@ -19,7 +19,7 @@ async function unixKill(input, opts) {
 				if (err) {
 					reject(err);
 				}
-				log(`Successfully terminated process running on port ${input}`);
+				console.log(`Successfully terminated process running on port ${input}`);
 				resolve();
 			});
 		});
@@ -30,8 +30,10 @@ async function win32Kill({ inputArray, opts }) {
 	const pids = [];
 	for (let i = 0; i < inputArray.length; i++) {
 		const pid = await pidFromPort(inputArray[i]);
-		pids.push(`/PID ${pid}`);
+		pids.push(pid);
 	}
-	const pidString = pids.join(' ');
-	const { stderr, stdout } = await execAsync(`TASKKILL /f /t ${pidString}`);
+
+	const { stderr, stdout } = await execAsync(`TASKKILL /f /t /pid ${pids.join(' ')}`);
+	console.log('stderr: ', stderr);
+	console.log('stdout', stdout);
 }

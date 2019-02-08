@@ -1,4 +1,5 @@
 {
+	"extends": "@debitoor/eslint-config-debitoor",
 	"parserOptions": {
 		"ecmaVersion": 8,
 		"sourceType": "module",

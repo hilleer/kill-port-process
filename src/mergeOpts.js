@@ -3,5 +3,5 @@ module.exports = (inputOpts) => {
 	return {
 		...defaultOpts,
 		inputOpts
-	}
-}
+	};
+};

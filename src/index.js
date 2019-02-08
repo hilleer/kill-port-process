@@ -14,7 +14,7 @@ module.exports = async (input, opts = {}) => {
 
 		switch (os.platform()) {
 			case 'win32':
-				return win32Kill({ inputArray, opts })
+				return win32Kill({ inputArray, opts });
 			default:
 				return unixKill({ inputArray, opts });
 		}

@@ -16,6 +16,7 @@
 	"author": "Daniel Hillmann",
 	"license": "ISC",
 	"dependencies": {
+		"@debitoor/eslint-config-debitoor": "3.0.0",
 		"execa": "^1.0.0",
 		"get-stream": "4.1.0",
 		"pid-from-port": "1.1.3"

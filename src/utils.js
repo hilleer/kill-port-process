@@ -1,7 +1,7 @@
 module.exports = {
 	arrayifyInput,
 	validateInput
-}
+};
 
 function arrayifyInput(input) {
 	return Array.isArray(input) ? input : [input];
