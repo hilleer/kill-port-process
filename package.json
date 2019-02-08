@@ -5,7 +5,7 @@
 	"main": "./src/index.js",
 	"typings": "index.d.ts",
 	"scripts": {
-		"test": "mocha"
+		"test": "mocha --file ./test/server.js"
 	},
 	"keywords": [
 		"process",
