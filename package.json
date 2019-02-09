@@ -1,21 +1,37 @@
 {
-  "name": "kill-port-process",
-  "version": "0.0.2",
-  "description": "module to delete process running on a specific port",
-  "main": "./index.js",
-  "typings": "index.d.ts",
-  "scripts": {
-    "test": "mocha"
-  },
-  "keywords": [
-    "process",
-    "kill",
-    "kill process",
-    "port"
-  ],
-  "author": "Daniel Hillmann",
-  "license": "ISC",
-  "dependencies": {
-    "pid-from-port": "1.1.3"
-  }
+	"name": "kill-port-process",
+	"version": "0.0.2",
+	"description": "module to delete process running on a specific port",
+	"main": "./src/index.js",
+	"typings": "index.d.ts",
+	"scripts": {
+		"test": "mocha --file ./test/server.js"
+	},
+	"keywords": [
+		"process",
+		"kill",
+		"kill process",
+		"port"
+	],
+	"author": "Daniel Hillmann",
+	"license": "ISC",
+	"dependencies": {
+		"pid-from-port": "1.1.3"
+	},
+	"devDependencies": {
+		"@debitoor/eslint-config-debitoor": "3.0.0",
+		"chai": "4.2.0",
+		"eslint": "5.9.0",
+		"mocha": "5.2.0",
+		"mocha-eslint": "4.1.0",
+		"node-fetch": "2.3.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/hilleer/kill-port-process"
+	},
+	"bugs": {
+		"url": "https://github.com/hilleer/kill-port-process/issues",
+		"email": "hiller@live.dk"
+	}
 }
