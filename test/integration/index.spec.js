@@ -21,15 +21,18 @@ describe.skip('kill-port-process', () => {
 			expect(actualResponseStatus).to.equal(expectedResponseStatus);
 		});
 		describe('when killing the process on the port', () => {
+			let actualStatus;
+			let expectedStatus;
 			before(async () => {
 				await killPortProcess(PORT, {});
 			});
 			before(async () => {
 				const response = await fetch(SERVER_URL);
-				console.log(response);
+				actualStatus = response.status;
+				expectedStatus = 500;
 			});
 			it('should kill the process', () => {
-				expect(true).to.be.true;
+				expect(actualStatus).to.equal(expectedStatus);
 			});
 		});
 	});

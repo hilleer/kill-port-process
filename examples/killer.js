@@ -1,7 +1,10 @@
 const killPortProcess = require('../src/index');
 
-main();
+const PORTS = [
+	1234,
+	2345
+];
 
-async function main() {
-	await killPortProcess(1234);
-}
+(async function() {
+	await killPortProcess(PORTS);
+})();

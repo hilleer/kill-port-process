@@ -8,9 +8,9 @@ module.exports = {
 	win32Kill
 };
 
-async function unixKill(input, opts) {
-	const promises = input.map(killPortProcess);
-	Promise.all(promises).catch();
+async function unixKill({ inputArray, opts }) {
+	const promises = inputArray.map(killPortProcess);
+	return Promise.all(promises);
 
 	async function killPortProcess(input) {
 		return new Promise((resolve, reject) => {
