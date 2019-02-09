@@ -6,18 +6,22 @@
 
 **Cross-platform** module to stop one (or more) process(es) running on a port (or a list of ports).
 
+## Install
+
+```bash
+$ npm install kill-port-process -E
+# or
+$ yarn add kill-port-process
+```
+
 ## Usage
 
 ```javascript
 const killPortProcess = require('kill-port-process');
 
-module.export.main = async () => {
-	try {
-		await killPortProcess([4001, 4002]); // takes a number or a number[]
-	} catch (error) {
-		throw error;
-	}
-};
+const PORT = 1234; // long-running process running on this, e.g. a web-server.
+await killPortProcess(PORT); // takes a number or a number[]
+
 ```
 
 ## Todo
@@ -25,4 +29,3 @@ module.export.main = async () => {
 * Add tests
 * Add test build (travis)
 * Add cli command
-* Clean up
