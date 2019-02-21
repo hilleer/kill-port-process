@@ -17,7 +17,7 @@ async function unixKill({ inputArray, opts }) {
 			const command = `lsof -i tcp:${input} | grep LISTEN | awk '{print $2}' | xargs kill -9`;
 			exec(command, (err, stdout, stderr) => {
 				if (err) {
-					reject(err);
+					return reject(err);
 				}
 				console.log(`Successfully terminated process running on port ${input}`);
 				resolve();
