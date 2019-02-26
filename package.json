@@ -5,7 +5,8 @@
 	"main": "./src/index.js",
 	"typings": "index.d.ts",
 	"scripts": {
-		"test": "mocha --file ./test/server.js"
+		"test": "mocha --file ./test/server.js",
+		"postversion": "git push && git push --tags"
 	},
 	"keywords": [
 		"process",
