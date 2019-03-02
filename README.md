@@ -16,12 +16,25 @@ $ yarn add kill-port-process
 
 ## Usage
 
+### Programmatic
+
 ```javascript
 const killPortProcess = require('kill-port-process');
 
 const PORT = 1234; // long-running process running on this, e.g. a web-server.
 await killPortProcess(PORT); // takes a number or a number[]
+```
 
+### CLI
+
+```bash
+$ kpp 1234
+# or
+$ kpp 1234 2345
+# or
+kpp -p 1234
+# or
+kpp --port 1234
 ```
 
 ## Todo

@@ -3,6 +3,9 @@
 	"version": "0.0.5",
 	"description": "module to delete process running on a specific port",
 	"main": "./src/index.js",
+	"bin": {
+		"kpp": "./src/cli.js"
+	},
 	"typings": "index.d.ts",
 	"scripts": {
 		"test": "mocha --file ./test/server.js",
@@ -12,11 +15,13 @@
 		"process",
 		"kill",
 		"kill process",
-		"port"
+		"port",
+		"CLI"
 	],
 	"author": "Daniel Hillmann",
 	"license": "ISC",
 	"dependencies": {
+		"commander": "2.19.0",
 		"pid-from-port": "1.1.3"
 	},
 	"devDependencies": {
