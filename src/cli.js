@@ -1,8 +1,27 @@
 #!/usr/bin/env node
-const commander = require('commander');
-const packageVersion = require('../package.json').version;
+const parse = require('get-them-args');
 
-commander
-	.version(packageVersion, '-v', '--version')
-	.parse(process.argv);
+const killPortProcess = require('./index');
 
+(async () => {
+	const args = parse(process.argv);
+	console.log('args', args);
+	if (!args) {
+		return;
+	}
+
+	const ports = parsePortFromArgs(args);
+
+	console.log('Attempting to kill port(s):', ports);
+	// await killPortProcess(ports);
+})();
+
+function parsePortFromArgs(args) {
+	if (args.p) {
+		return args.p;
+	}
+	if (args.port) {
+		return args.port;
+	}
+	return args.unknown;
+}
