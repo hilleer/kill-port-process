@@ -10,7 +10,8 @@ module.exports = async (input, opts = {}) => {
 
 		opts = mergeOpts(opts);
 
-		const inputArray = arrayifyInput(input);
+		let inputArray = arrayifyInput(input);
+		inputArray = inputArray.map(i => Number(i));
 
 		switch (os.platform()) {
 			case 'win32':

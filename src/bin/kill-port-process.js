@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 const parse = require('get-them-args');
 
-const killPortProcess = require('./index');
+const killPortProcess = require('../lib/index');
 
 (async () => {
-	const args = parse(process.argv);
+	const args = parse(process.argv.slice(2));
 	console.log('args', args);
 	if (!args) {
 		return;
@@ -13,7 +13,7 @@ const killPortProcess = require('./index');
 	const ports = parsePortFromArgs(args);
 
 	console.log('Attempting to kill port(s):', ports);
-	// await killPortProcess(ports);
+	await killPortProcess(ports);
 })();
 
 function parsePortFromArgs(args) {
