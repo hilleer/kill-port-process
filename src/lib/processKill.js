@@ -27,5 +27,7 @@ async function win32Kill({ inputArray, opts }) {
 		pids.push(pid);
 	}
 
-	await execAsync(`TASKKILL /f /t /pid ${pids.join(' ')}`);
+	const { stdout, stderr } = await execAsync(`TASKKILL /f /t /pid ${pids.join(' ')}`);
+	if (stderr) { console.log(stderr); }
+	if (stdout) { console.log(stdout); }
 }
