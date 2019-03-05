@@ -38,9 +38,9 @@ $ kill-port 1234
 # or multiple ports
 $ kill-port 1234 2345
 # or
-kill-port -p 1234
+$ kill-port -p 1234
 # or
-kill-port --port 1234
+$ kill-port --port 1234
 ```
 
 ## Todo
