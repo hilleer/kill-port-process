@@ -20,6 +20,16 @@ module.exports = async (input, opts = {}) => {
 				return unixKill({ inputArray, opts });
 		}
 	} catch (error) {
-		throw error;
+		throw new KillError(error, input, opts);
 	}
 };
+
+class KillError extends Error {
+	constructor(error, input, opts) {
+		const errorMessage = error.message || 'Error happened trying to kill process(es) on port(s)';
+		super(errorMessage);
+		this.error = error;
+		this.input = input;
+		this.opts = opts;
+	}
+}
