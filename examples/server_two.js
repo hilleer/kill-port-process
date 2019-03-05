@@ -2,4 +2,5 @@ const http = require('http');
 
 const server = http.createServer();
 
-server.listen(2345, () => console.log('Listening...'));
+const PORT = 2345;
+server.listen(PORT, () => console.log(`Listening on ${PORT}`));

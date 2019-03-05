@@ -13,16 +13,10 @@ async function unixKill({ inputArray, opts }) {
 	return Promise.all(promises);
 
 	async function killPortProcess(input) {
-		return new Promise((resolve, reject) => {
-			const command = `lsof -i tcp:${input} | grep LISTEN | awk '{print $2}' | xargs kill -9`;
-			exec(command, (err, stdout, stderr) => {
-				if (err) {
-					return reject(err);
-				}
-				console.log(`Successfully terminated process running on port ${input}`);
-				resolve();
-			});
-		});
+		const command = `lsof -i tcp:${input} | grep LISTEN | awk '{print $2}' | xargs kill -9`;
+		const { stdout, stderr } = await execAsync(command);
+		stderr && console.log(stderr);
+		stdout && console.log(stdout);
 	}
 }
 
@@ -33,7 +27,7 @@ async function win32Kill({ inputArray, opts }) {
 		pids.push(pid);
 	}
 
-	const { stderr, stdout } = await execAsync(`TASKKILL /f /t /pid ${pids.join(' ')}`);
-	console.log('stderr: ', stderr);
-	console.log('stdout', stdout);
+	const { stdout, stderr } = await execAsync(`TASKKILL /f /t /pid ${pids.join(' ')}`);
+	stderr && console.log(stderr);
+	stdout && console.log(stdout);
 }

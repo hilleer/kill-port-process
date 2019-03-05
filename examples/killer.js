@@ -1,4 +1,4 @@
-const killPortProcess = require('../src/index');
+const killPortProcess = require('../src/lib/index');
 
 const PORTS = [
 	1234,
