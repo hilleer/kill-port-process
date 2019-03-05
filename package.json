@@ -4,7 +4,7 @@
 	"description": "module to delete process running on a specific port",
 	"main": "./src/lib/index.js",
 	"bin": {
-		"kpp": "./src/bin/kill-port-process.js"
+		"kill-port": "./src/bin/kill-port-process.js"
 	},
 	"typings": "index.d.ts",
 	"scripts": {

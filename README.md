@@ -29,18 +29,18 @@ await killPortProcess(PORT); // takes a number or a number[]
 
 Install the module globally: `npm install kill-port-process -g`.
 
-You can use the CLI calling it with `kpp <port>`.
+You can use the CLI calling it with `kill-port <port>`.
 
 It takes a single port or a list of ports separated by a space. Valid flags are `-p` and `--port` but are both optional.
 
 ```bash
-$ kpp 1234
+$ kill-port 1234
 # or multiple ports
-$ kpp 1234 2345
+$ kill-port 1234 2345
 # or
-kpp -p 1234
+kill-port -p 1234
 # or
-kpp --port 1234
+kill-port --port 1234
 ```
 
 ## Todo

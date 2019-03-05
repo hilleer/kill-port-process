@@ -5,14 +5,16 @@ const killPortProcess = require('../lib/index');
 
 (async () => {
 	const args = parse(process.argv.slice(2));
-	console.log('args', args);
 	if (!args) {
 		return;
 	}
 
 	const ports = parsePortFromArgs(args);
 
-	console.log('Attempting to kill port(s):', ports);
+	if (!ports) {
+		return;
+	}
+
 	await killPortProcess(ports);
 })();
 
