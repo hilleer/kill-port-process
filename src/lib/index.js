@@ -26,7 +26,7 @@ module.exports = async (input, opts = {}) => {
 
 class KillError extends Error {
 	constructor(error, input, opts) {
-		const errorMessage = error.message || 'Error happened trying to kill process(es) on port(s)';
+		const errorMessage = error.message || 'An error occured while trying to kill process(es) on provided port(s)';
 		super(errorMessage);
 		this.error = error;
 		this.input = input;
