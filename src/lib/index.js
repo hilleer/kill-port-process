@@ -1,35 +1,35 @@
 const os = require('os');
 const { win32Kill, unixKill } = require('./processKill');
 
-const mergeOpts = require('./mergeOpts');
+const mergeOptions = require('./mergeOptions');
 const { arrayifyInput, validateInput } = require('./utils');
 
-module.exports = async (input, opts = {}) => {
+module.exports = async (input, options = {}) => {
 	try {
 		validateInput(input);
 
-		opts = mergeOpts(opts);
+		options = mergeOptions(options);
 
 		let inputArray = arrayifyInput(input);
 		inputArray = inputArray.map(i => Number(i));
 
 		switch (os.platform()) {
 			case 'win32':
-				return win32Kill({ inputArray, opts });
+				return win32Kill({ inputArray, options });
 			default:
-				return unixKill({ inputArray, opts });
+				return unixKill({ inputArray, options });
 		}
 	} catch (error) {
-		throw new KillError(error, input, opts);
+		throw new KillError(error, input, options);
 	}
 };
 
 class KillError extends Error {
-	constructor(error, input, opts) {
+	constructor(error, input, options) {
 		const errorMessage = error.message || 'An error occured while trying to kill process(es) on provided port(s)';
 		super(errorMessage);
 		this.error = error;
 		this.input = input;
-		this.opts = opts;
+		this.options = options;
 	}
 }
