@@ -1,4 +1,4 @@
-import os from 'os';
+import { platform } from 'os';
 
 import { Killer } from './killer';
 
@@ -11,7 +11,7 @@ export default function(input, options = {}) {
 
 		const killer = new Killer(ports, mergedOptions);
 
-		switch(os.platform()) {
+		switch(platform()) {
 			case 'win32':
 				return killer.win32Kill();
 			default:

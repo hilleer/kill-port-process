@@ -9,6 +9,7 @@
 	"typings": "index.d.ts",
 	"scripts": {
 		"test": "mocha --file ./test/server.js",
+		"build": "",
 		"postversion": "git push && git push --tags"
 	},
 	"keywords": [
