@@ -2,7 +2,7 @@ import { platform } from 'os';
 
 import { Killer } from './killer';
 
-export default function(input, options = {}) {
+export default function(input, options: Options = {}) {
 	
 	try {
 		validateInput(input);

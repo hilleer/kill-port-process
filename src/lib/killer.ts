@@ -1,4 +1,4 @@
-import pidFromPort from 'pid-from-port';
+import * as pidFromPort from 'pid-from-port';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 

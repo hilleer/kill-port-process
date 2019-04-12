@@ -1,5 +1,5 @@
 #! /usr/bin/env node
-import getThemArgs from 'get-them-args';
+import * as getThemArgs from 'get-them-args';
 
 import killPortProcess from '../lib/index';
 
