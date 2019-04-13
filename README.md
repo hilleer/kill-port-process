@@ -43,8 +43,6 @@ $ kill-port -p 1234
 $ kill-port --port 1234
 ```
 
-## Todo
+## Tests
 
-* Add tests
-* Add test build (travis)
-* Add cli command
+Having trouble solving issues with tests, as mocha exits unexpectedly without any error information. After many, many attempts and many, many google keyword searches, I suspect that the call to kill the port actually kills mocha's child process too and that is the reason for the missing error.

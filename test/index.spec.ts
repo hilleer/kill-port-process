@@ -1,4 +1,6 @@
 import { createServer } from 'http';
+import { expect } from 'chai';
+
 import killPortProcess from '../src/lib';
 
 describe('index', () => {
@@ -9,13 +11,14 @@ describe('index', () => {
 			createServer((req, res) => res.end())
 				.listen(PORT, () => done());
 		});
-		it('should kill port', async () => {
+		it('should kill port', async function() {
+			let actualError;
 			try {
 				await killPortProcess(PORT)
 			} catch (error) {
-				console.log('error', error);
-				console.log('err, err!');
+				actualError = error;
 			}
+			expect(actualError).to.be.undefined;
 		});
 	});
 });
