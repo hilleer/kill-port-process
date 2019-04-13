@@ -1,3 +1,6 @@
+test/index.spec.ts
 --exit
-./test/**/*.spec.js
 --timeout 4000
+--require ts-node/register
+--allow-uncaught
+--full-trace

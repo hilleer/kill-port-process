@@ -2,13 +2,14 @@
 	"name": "kill-port-process",
 	"version": "0.0.6",
 	"description": "Easily kill hanging processes on ports - on any platform!",
-	"main": "./src/lib/index.js",
+	"main": "dist/lib/index.js",
 	"bin": {
-		"kill-port": "./src/bin/kill-port-process.js"
+		"kill-port": "dist/bin/kill-port-process.js"
 	},
 	"typings": "index.d.ts",
 	"scripts": {
-		"test": "mocha --file ./test/server.js",
+		"test": "mocha",
+		"build": "tsc",
 		"postversion": "git push && git push --tags"
 	},
 	"keywords": [
@@ -26,11 +27,12 @@
 	},
 	"devDependencies": {
 		"@debitoor/eslint-config-debitoor": "3.0.0",
+		"@types/mocha": "5.2.6",
+		"@types/node": "11.13.4",
 		"chai": "4.2.0",
-		"eslint": "5.9.0",
 		"mocha": "5.2.0",
-		"mocha-eslint": "4.1.0",
-		"node-fetch": "2.3.0"
+		"ts-node": "8.0.3",
+		"typescript": "3.4.3"
 	},
 	"repository": {
 		"type": "git",
