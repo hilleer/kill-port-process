@@ -12,7 +12,7 @@ export default async function(input, options: Options = {}) {
 		const killer = new Killer(ports, mergedOptions, platform());
 		await killer.kill();
 	} catch (error) {
-		throw new Error(error)
+		throw error;
 	}
 }
 
