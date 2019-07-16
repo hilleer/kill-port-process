@@ -16,25 +16,27 @@ export default async function(input, options: Options = {}) {
 	}
 }
 
-function validateInput(input) {
+export function validateInput(input) {
 	if (!input) {
+		console.log('throwing');
 		throw new InvalidInputError('No input provided');
 	}
+	console.log('not throwing');
 }
 
-function arrayifyInput(input) {
+export function arrayifyInput(input) {
 	return Array.isArray(input) ? input : [input];
 }
 
 export type Options = {};
 
-function mergeOptions(options: Options) {
+export function mergeOptions(options: Options) {
 	const defaultOptions = {};
 
 	return { ...defaultOptions, options };
 }
 
-class InvalidInputError extends Error {
+export class InvalidInputError extends Error {
 	constructor(message) {
 		super(message);
 	}
