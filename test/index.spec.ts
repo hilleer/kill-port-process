@@ -1,7 +1,7 @@
-import { createServer } from 'http';
 import { expect } from 'chai';
+import { createServer } from 'http';
 
-import killPortProcess, { arrayifyInput, validateInput, InvalidInputError } from '../src/lib';
+import killPortProcess, { arrayifyInput, IsInputValid } from '../src/lib';
 
 describe('index', () => {
 	describe.skip('when called on a port', () => {
@@ -11,40 +11,28 @@ describe('index', () => {
 			createServer((req, res) => res.end())
 				.listen(PORT, () => done());
 		});
-		it('should kill port', async function() {
+		it('should kill port', async () => {
 			let actualError;
 			try {
-				await killPortProcess(PORT)
+				await killPortProcess(PORT);
 			} catch (error) {
 				actualError = error;
 			}
 			expect(actualError).to.be.undefined;
 		});
 	});
-	describe('validateInput()', () => {
+	describe('IsInputValid()', () => {
 		describe('when input is defined', () => {
-			it('should not throw', () => {
-				let error: any;
-				
-				try {
-					validateInput(1234);
-				} catch (err) {
-					error = error;
-				}
-				expect(error).to.be.undefined;
+			it('should return true', () => {
+				const actual = IsInputValid(1234);
+				expect(actual).to.be.true;
 			});
 		});
 		describe('when input is undefined', () => {
-			it('should throw an error', () => {
-				let error;
-				
-				try {
-					const input = undefined;
-					validateInput(input);
-				} catch (err) {
-					error = err;
-				}
-				expect(error).to.be.an.instanceof(InvalidInputError);
+			it('should return false', () => {
+				const input = undefined;
+				const actual = IsInputValid(input);
+				expect(actual).to.be.false;
 			});
 		});
 	});
@@ -56,7 +44,7 @@ describe('index', () => {
 				const actual = arrayifyInput(input);
 				const expected = [1234];
 
-				expect(actual).to.deep.eql(expected);
+				expect(actual).to.deep.equal(expected);
 			});
 		});
 		describe('when input is not of type array', () => {
@@ -66,7 +54,7 @@ describe('index', () => {
 				const actual = arrayifyInput(input);
 				const expected = [1234];
 
-				expect(actual).to.deep.eql(expected);
+				expect(actual).to.deep.equal(expected);
 			});
 		});
 	});

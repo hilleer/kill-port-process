@@ -21,12 +21,12 @@ import killPortProcess from '../lib/index';
 	await killPortProcess(ports);
 })();
 
-type Ports = string | number | string [] | number [];
-type Args = {
+type Ports = string | number | string[] | number[];
+interface Args {
 	p?: Ports;
 	port?: Ports;
 	unknown?: Ports;
-};
+}
 
 function parsePortFromArgs(args: Args) {
 	if (args.p) {

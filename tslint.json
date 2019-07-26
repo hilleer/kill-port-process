@@ -1,4 +1,10 @@
 {
 	"extends": "tslint:recommended",
-	"rules": {}
+	"rules": {
+		"quotemark": false,
+		"no-console": false,
+		"indent": false,
+		"no-unused-expression": false,
+		"interface-name": false
+	}
 }
