@@ -2,7 +2,7 @@ import { exec } from 'child_process';
 import * as pidFromPort from 'pid-from-port';
 import { promisify } from 'util';
 
-import { Options } from ".";
+import { Options } from "./helpers";
 
 const execAsync = promisify(exec);
 
