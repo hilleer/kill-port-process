@@ -1,73 +1,35 @@
-import { createServer } from 'http';
 import { expect } from 'chai';
+import { spawn } from 'child_process';
+import fetch, { FetchError } from 'node-fetch';
 
-import killPortProcess, { arrayifyInput, validateInput, InvalidInputError } from '../src/lib';
+import killPortProcess from '../src/lib/index';
 
 describe('index', () => {
-	describe.skip('when called on a port', () => {
-		const PORT = 1234;
-
-		before((done) => {
-			createServer((req, res) => res.end())
-				.listen(PORT, () => done());
-		});
-		it('should kill port', async function() {
-			let actualError;
-			try {
-				await killPortProcess(PORT)
-			} catch (error) {
-				actualError = error;
-			}
-			expect(actualError).to.be.undefined;
-		});
-	});
-	describe('validateInput()', () => {
-		describe('when input is defined', () => {
-			it('should not throw', () => {
-				let error: any;
-				
-				try {
-					validateInput(1234);
-				} catch (err) {
-					error = error;
-				}
-				expect(error).to.be.undefined;
+	describe('lala', () => {
+		let actualListen: string;
+		let expectedListen: string;
+		before('start a fake server', (done) => {
+			const child = spawn('node', ['test/fake-server.js']);
+			child.stdout.on('data', (data) => {
+				actualListen = data.toString();
+				expectedListen = 'Listening on 1234';
+				done();
+			});
+			child.stderr.on('data', (data) => {
+				console.log('stderr', data.toString());
 			});
 		});
-		describe('when input is undefined', () => {
-			it('should throw an error', () => {
-				let error;
-				
-				try {
-					const input = undefined;
-					validateInput(input);
-				} catch (err) {
-					error = err;
-				}
-				expect(error).to.be.an.instanceof(InvalidInputError);
-			});
+		let actualFetchError: FetchError;
+		before('kill port, make request', async () => {
+			await killPortProcess(1234);
+			await fetch(`http://localhost:1234/`, { method: 'GET' })
+				.catch((reason) => actualFetchError = reason);
 		});
-	});
-	describe('arrayifyInput()', () => {
-		describe('when input is an array', () => {
-			it('should return as is', () => {
-				const input = [1234];
-
-				const actual = arrayifyInput(input);
-				const expected = [1234];
-
-				expect(actual).to.deep.eql(expected);
-			});
+		it('should actually listen on a server', () => {
+			expect(actualListen).to.be.equal(expectedListen);
 		});
-		describe('when input is not of type array', () => {
-			it('should arrayify input', () => {
-				const input = 1234;
-
-				const actual = arrayifyInput(input);
-				const expected = [1234];
-
-				expect(actual).to.deep.eql(expected);
-			});
+		it('should be true', () => {
+			expect(actualFetchError).to.be.an.instanceOf(FetchError);
 		});
 	});
 });

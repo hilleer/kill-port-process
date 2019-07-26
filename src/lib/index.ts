@@ -1,43 +1,24 @@
 import { platform } from 'os';
 
+import { arrayifyInput, InvalidInputError, IsInputValid, mergeOptions, Options } from './helpers';
 import { Killer } from './killer';
 
-export default async function(input, options: Options = {}) {
+export default async function(input: any, options: Options = {}) {
 
 	try {
-		validateInput(input);
+		const validInput = IsInputValid(input);
+
+		if (!validInput) {
+			throw new InvalidInputError('Invalid input', input);
+		}
+
 		const mergedOptions = mergeOptions(options);
-		const ports = arrayifyInput(input).map(i => Number(i));
+		const toNumber = (value: string | number) => Number(value);
+		const ports = arrayifyInput(input).map(toNumber);
 
 		const killer = new Killer(ports, mergedOptions, platform());
 		await killer.kill();
 	} catch (error) {
 		throw error;
-	}
-}
-
-export function validateInput(input) {
-	if (!input) {
-		console.log('throwing');
-		throw new InvalidInputError('No input provided');
-	}
-	console.log('not throwing');
-}
-
-export function arrayifyInput(input) {
-	return Array.isArray(input) ? input : [input];
-}
-
-export type Options = {};
-
-export function mergeOptions(options: Options) {
-	const defaultOptions = {};
-
-	return { ...defaultOptions, options };
-}
-
-export class InvalidInputError extends Error {
-	constructor(message) {
-		super(message);
 	}
 }

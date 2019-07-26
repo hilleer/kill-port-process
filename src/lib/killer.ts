@@ -1,8 +1,8 @@
+import { exec } from 'child_process';
 import * as pidFromPort from 'pid-from-port';
-import { exec, spawn } from 'child_process';
 import { promisify } from 'util';
 
-import { Options } from ".";
+import { Options } from "./helpers";
 
 const execAsync = promisify(exec);
 
@@ -13,7 +13,7 @@ export class Killer {
 	constructor(ports: number[], options: Options, platform) {
 		this.ports = ports;
 		this.options = options;
-		this.platform = platform
+		this.platform = platform;
 	}
 
 	public async kill() {
