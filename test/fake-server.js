@@ -5,6 +5,6 @@ const server = http.createServer((req, res) => {
 	res.end();
 });
 
-const PORT = 1234;
+const PORT = process.argv[2];
 
 server.listen(PORT, () => process.stdout.write(`Listening on ${PORT}`));
