@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { spawn } from 'child_process';
 import fetch, { FetchError } from 'node-fetch';
 
-import killPortProcess from '../src/lib/index';
+import { killPortProcess } from '../src/lib/index';
 
 describe('index', () => {
 	describe('killPortProcess()', () => {
