@@ -3,7 +3,7 @@ import { platform } from 'os';
 import { arrayifyInput, InvalidInputError, IsInputValid, mergeOptions, Options } from './helpers';
 import { Killer } from './killer';
 
-export default async function(input: any, options: Options = {}) {
+export async function killPortProcess(input: any, options: Options = {}) {
 
 	try {
 		const validInput = IsInputValid(input);

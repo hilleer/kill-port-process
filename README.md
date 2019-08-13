@@ -19,7 +19,7 @@ $ yarn add kill-port-process
 ### Programmatic
 
 ```javascript
-const killPortProcess = require('kill-port-process');
+const { killPortProcess } = require('kill-port-process');
 
 const PORT = 1234; // long-running process running on this, e.g. a web-server.
 await killPortProcess(PORT); // takes a number or a number[]

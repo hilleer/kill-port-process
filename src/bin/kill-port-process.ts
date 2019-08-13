@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 import * as getThemArgs from 'get-them-args';
 
-import killPortProcess from '../lib/index';
+import { killPortProcess } from '../lib/index';
 
 (async () => {
 	const args = getThemArgs(process.argv.slice(2));
