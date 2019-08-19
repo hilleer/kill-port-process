@@ -18,7 +18,6 @@ export async function killPortProcess(input: any, options: Options = {}) {
 
 		const killer = new Killer(ports, mergedOptions, platform());
 		await killer.kill();
-		console.log('await is done');
 	} catch (error) {
 		throw error;
 	}
