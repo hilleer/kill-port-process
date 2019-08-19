@@ -19,7 +19,7 @@ export class Killer {
 	public async kill() {
 		const killFunc = this.platform === 'win32' ? this.win32Kill : this.unixKill;
 		const promises = this.ports.map(killFunc);
-		return Promise.all(promises).catch((err) => console.log('ERR!', err));
+		return Promise.all(promises);
 	}
 
 	private async win32Kill(port) {

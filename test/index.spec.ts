@@ -60,10 +60,12 @@ describe('index', () => {
 			before('kill port, make request', async () => {
 				await killPortProcess([1234, 2345])
 					.catch((reason) => actualKillError = reason);
-				await fetch(`${localhost}:1234/`, { method: 'GET' })
-					.catch((reason) => actualFetchErrorOne = reason);
-				await fetch(`${localhost}:234`, { method: 'GET' })
-					.catch((reason) => actualFetchErrorTwo = reason);
+				await Promise.all([
+					fetch(`${localhost}:1234/`, { method: 'GET' })
+						.catch((reason) => actualFetchErrorOne = reason),
+					fetch(`${localhost}:234`, { method: 'GET' })
+						.catch((reason) => actualFetchErrorTwo = reason),
+				]);
 			});
 			it('should actually listen on server one', () => {
 				expect(actualListenOne).to.equal(expectedListenOne);
