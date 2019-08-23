@@ -1,4 +1,5 @@
 import { exec } from 'child_process';
+import { platform } from 'os';
 import * as pidFromPort from 'pid-from-port';
 
 import { Options } from "./helpers";
@@ -6,15 +7,13 @@ import { Options } from "./helpers";
 export class Killer {
 	protected ports: number[];
 	protected options: Options;
-	protected platform: NodeJS.Platform;
-	constructor(ports: number[], options: Options, platform) {
+	constructor(ports: number[], options: Options) {
 		this.ports = ports;
 		this.options = options;
-		this.platform = platform;
 	}
 
 	public async kill() {
-		const killFunc = this.platform === 'win32' ? this.win32Kill : this.unixKill;
+		const killFunc = platform() === 'win32' ? this.win32Kill : this.unixKill;
 		const promises = this.ports.map(killFunc);
 		return Promise.all(promises);
 	}

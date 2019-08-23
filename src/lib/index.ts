@@ -1,5 +1,3 @@
-import { platform } from 'os';
-
 import { arrayifyInput, InvalidInputError, IsInputValid, mergeOptions, Options } from './helpers';
 import { Killer } from './killer';
 
@@ -16,7 +14,7 @@ export async function killPortProcess(input: any, options: Options = {}) {
 		const toNumber = (value: string | number) => Number(value);
 		const ports = arrayifyInput(input).map(toNumber);
 
-		const killer = new Killer(ports, mergedOptions, platform());
+		const killer = new Killer(ports, mergedOptions);
 		await killer.kill();
 	} catch (error) {
 		throw error;
