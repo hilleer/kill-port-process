@@ -1,10 +1,7 @@
 import { exec } from 'child_process';
 import * as pidFromPort from 'pid-from-port';
-import { promisify } from 'util';
 
 import { Options } from "./helpers";
-
-const execAsync = promisify(exec);
 
 export class Killer {
 	protected ports: number[];
@@ -24,14 +21,30 @@ export class Killer {
 
 	private async win32Kill(port) {
 		const pid = await pidFromPort(port);
-		const { stdout, stderr } = await execAsync(`TASKKILL /f /t /pid ${pid}`);
-		stderr && console.log(stderr);
-		stdout && console.log(stdout);
+		return new Promise((resolve, reject) => {
+			exec(`TASKKILL /f /t /pid ${pid}`, (err, stdout, stderr) => {
+				if (err) {
+					reject(err);
+					return;
+				}
+				stderr && console.log(stderr);
+				stdout && console.log(stdout);
+				resolve();
+			});
+		});
 	}
 
 	private async unixKill(port) {
-		const { stdout, stderr } = await execAsync(`lsof -i tcp:${port} | grep LISTEN | awk '{print $2}' | xargs kill -9`);
-		stderr && console.log(stderr);
-		stdout && console.log(stdout);
+		return new Promise((resolve, reject) => {
+			exec(`lsof -i tcp:${port} | grep LISTEN | awk '{print $2}' | xargs kill -9`, (err, stdout, stderr) => {
+				if (err) {
+					reject(err);
+					return;
+				}
+				stderr && console.log(stderr);
+				stdout && console.log(stdout);
+				resolve();
+			});
+		});
 	}
 }
