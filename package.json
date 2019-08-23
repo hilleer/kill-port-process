@@ -9,6 +9,7 @@
 	"typings": "index.d.ts",
 	"scripts": {
 		"test": "mocha",
+		"pretest": "npm run build",
 		"build": "tsc",
 		"prepublish": "npm run build && npm test",
 		"preversion": "npm run build && npm test",

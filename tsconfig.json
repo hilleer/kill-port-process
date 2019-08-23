@@ -5,7 +5,7 @@
 		"sourceMap": false,
 		"outDir": "dist",
 		"baseUrl": ".",
-		"noUnusedLocals": false,
+		"noUnusedLocals": true,
 		"strict": false
 	},
 	"include": [
