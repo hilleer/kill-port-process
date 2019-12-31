@@ -39,18 +39,19 @@ describe('index', () => {
 			let actualListenOne: string;
 			let expectedListenOne: string;
 			before('start one fake server', (done) => {
-				startFakeServer(1234, (data) => {
+				startFakeServer(5678, (data) => {
 					actualListenOne = data.toString();
-					expectedListenOne = 'Listening on 1234';
+					expectedListenOne = 'Listening on 5678';
+					console.log('server started');
 					done();
 				});
 			});
 			let actualListenTwo: string;
 			let expectedListenTwo: string;
 			before('start second fake server', (done) => {
-				startFakeServer(2345, (data) => {
+				startFakeServer(6789, (data) => {
 					actualListenTwo = data.toString();
-					expectedListenTwo = 'Listening on 2345';
+					expectedListenTwo = 'Listening on 6789';
 					done();
 				});
 			});
@@ -58,12 +59,12 @@ describe('index', () => {
 			let actualFetchErrorOne: FetchError;
 			let actualFetchErrorTwo: FetchError;
 			before('kill port, make request', async () => {
-				await killPortProcess([1234, 2345])
+				await killPortProcess([5678, 6789])
 					.catch((reason) => actualKillError = reason);
 				await Promise.all([
-					fetch(`${localhost}:1234/`, { method: 'GET' })
+					fetch(`${localhost}:5678/`, { method: 'GET' })
 						.catch((reason) => actualFetchErrorOne = reason),
-					fetch(`${localhost}:234`, { method: 'GET' })
+					fetch(`${localhost}:6789`, { method: 'GET' })
 						.catch((reason) => actualFetchErrorTwo = reason),
 				]);
 			});
@@ -76,11 +77,11 @@ describe('index', () => {
 			it('should not throw an error calling killPortProcess', () => {
 				expect(actualKillError).to.be.undefined;
 			});
-			it('should not throw an error two', () => {
-				expect(actualFetchErrorTwo).to.be.an.instanceOf(FetchError);
-			});
-			it('should be true', () => {
+			it('should throw an error on fetch one', () => {
 				expect(actualFetchErrorOne).to.be.an.instanceOf(FetchError);
+			});
+			it('should throw an error on fetch two', () => {
+				expect(actualFetchErrorTwo).to.be.an.instanceOf(FetchError);
 			});
 		});
 	});
@@ -88,7 +89,6 @@ describe('index', () => {
 
 function startFakeServer(port: any, cb: any) {
 	const child = spawn('node', ['test/fake-server.js', port]);
-	child.stdout.on('data', (data) => {
-		cb(data);
-	});
+	child.stderr.on('data', (data) => console.log('ERR', data.toString()));
+	child.stdout.on('data', (data) => cb(data));
 }
