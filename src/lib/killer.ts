@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 import { platform } from 'os';
 import * as pidFromPort from 'pid-from-port';
 
@@ -21,29 +21,49 @@ export class Killer {
 	private async win32Kill(port) {
 		const pid = await pidFromPort(port);
 		return new Promise((resolve, reject) => {
-			exec(`TASKKILL /f /t /pid ${pid}`, (err, stdout, stderr) => {
-				if (err) {
-					reject(err);
+			const taskkill = spawn('TASKKILL', ['/f', '/t', '/pid', pid.toString()]);
+			taskkill.stdout.on('data', (data) => console.log(data));
+			taskkill.stderr.on('data', (data) => console.error(data));
+			taskkill.on('close', (code, signal) => {
+				if (code !== 0) {
+					reject(`taskkill process exited with code ${code} and signal ${signal}`);
 					return;
 				}
-				stderr && console.log(stderr);
-				stdout && console.log(stdout);
 				resolve();
 			});
+			taskkill.on('error', (err) => reject(err));
 		});
 	}
 
 	private async unixKill(port) {
 		return new Promise((resolve, reject) => {
-			exec(`lsof -i tcp:${port} | grep LISTEN | awk '{print $2}' | xargs kill -9`, (err, stdout, stderr) => {
-				if (err) {
-					reject(err);
+			const lsof = spawn('lsof', ['-i', `tcp:${port}`]);
+			const grep = spawn('grep', ['LISTEN']);
+			const awk = spawn('awk', ['{print $2}']);
+			const xargs = spawn('xargs', ['kill', '-9']);
+
+			lsof.stdout.pipe(grep.stdin);
+			lsof.stderr.on('data', logStderrData('lsof'));
+
+			grep.stdout.pipe(awk.stdin);
+			grep.stderr.on('data', logStderrData('grep'));
+
+			awk.stdout.pipe(xargs.stdin);
+			awk.stderr.on('data', logStderrData('awk'));
+
+			xargs.stdout.pipe(process.stdin);
+			xargs.stderr.on('data', logStderrData('xargs'));
+			xargs.on('close', (code) => {
+				if (code !== 0) {
+					reject();
 					return;
 				}
-				stderr && console.log(stderr);
-				stdout && console.log(stdout);
 				resolve();
 			});
+
+			function logStderrData(command) {
+				return (data) => console.error(`${command} - ${data.toString()}`);
+			}
 		});
 	}
 }
