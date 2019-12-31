@@ -22,8 +22,8 @@ export class Killer {
 		const pid = await pidFromPort(port);
 		return new Promise((resolve, reject) => {
 			const taskkill = spawn('TASKKILL', ['/f', '/t', '/pid', pid.toString()]);
-			taskkill.stdout.on('data', (data) => console.log(data));
-			taskkill.stderr.on('data', (data) => console.error(data));
+			taskkill.stdout.on('data', (data) => console.log(data.toString()));
+			taskkill.stderr.on('data', (data) => console.error(data.toString()));
 			taskkill.on('close', (code, signal) => {
 				if (code !== 0) {
 					reject(`taskkill process exited with code ${code} and signal ${signal}`);
