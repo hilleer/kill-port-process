@@ -42,7 +42,6 @@ describe('index', () => {
 				startFakeServer(5678, (data) => {
 					actualListenOne = data.toString();
 					expectedListenOne = 'Listening on 5678';
-					console.log('server started');
 					done();
 				});
 			});
