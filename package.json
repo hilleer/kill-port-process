@@ -50,5 +50,8 @@
 	"bugs": {
 		"url": "https://github.com/hilleer/kill-port-process/issues",
 		"email": "hiller@live.dk"
+	},
+	"engines": {
+		"node": ">=6.0.0"
 	}
 }
