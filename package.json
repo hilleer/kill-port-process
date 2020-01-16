@@ -1,6 +1,6 @@
 {
 	"name": "kill-port-process",
-	"version": "2.2.0",
+	"version": "2.2.1",
 	"description": "Easily kill hanging processes on ports - on any platform!",
 	"main": "dist/lib/index.js",
 	"bin": {
