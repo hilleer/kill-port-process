@@ -4,3 +4,4 @@ examples/
 tsconfig.json
 tslint.json
 .travis.yml
+.wakatime-project
