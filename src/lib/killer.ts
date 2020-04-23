@@ -1,8 +1,7 @@
 import { spawn } from 'child_process';
 import { platform } from 'os';
 import * as pidFromPort from 'pid-from-port';
-
-import { Options } from "./helpers";
+import { Options } from './index';
 
 export class Killer {
 	protected ports: number[];

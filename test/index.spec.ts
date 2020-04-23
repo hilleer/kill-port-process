@@ -2,10 +2,36 @@ import { expect } from 'chai';
 import { spawn } from 'child_process';
 import fetch, { FetchError } from 'node-fetch';
 
-import { killPortProcess } from '../src/lib/index';
+import { arrayifyInput, killPortProcess } from '../src/lib/index';
 
 describe('index', () => {
 	describe('killPortProcess()', () => {
+		describe('when called with undefined', () => {
+			let actualError: any;
+			before(async () => {
+				try {
+					await killPortProcess(undefined);
+				} catch (error) {
+					actualError = error;
+				}
+			});
+			it('should throw an error', () => {
+				expect(actualError).to.be.an.instanceOf(Error);
+			});
+		});
+		describe('when called with null', () => {
+			let actualError: any;
+			before(async () => {
+				try {
+					await killPortProcess(null);
+				} catch (error) {
+					actualError = error;
+				}
+			});
+			it('should throw an error', () => {
+				expect(actualError).to.be.an.instanceOf(Error);
+			});
+		});
 		describe('when called with a single port', () => {
 			let actualListen: string;
 			let expectedListen: string;
@@ -93,6 +119,28 @@ describe('index', () => {
 			});
 			it('should not throw an error', () => {
 				expect(actualError).to.be.undefined;
+			});
+		});
+	});
+	describe('arrayifyInput()', () => {
+		describe('when input is an array', () => {
+			it('should return as is', () => {
+				const input = [1234];
+
+				const actual = arrayifyInput(input);
+				const expected = [1234];
+
+				expect(actual).to.deep.equal(expected);
+			});
+		});
+		describe('when input is not of type array', () => {
+			it('should arrayify input', () => {
+				const input = 1234;
+
+				const actual = arrayifyInput(input);
+				const expected = [1234];
+
+				expect(actual).to.deep.equal(expected);
 			});
 		});
 	});
