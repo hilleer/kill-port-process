@@ -15,11 +15,17 @@ export class Killer {
 	public async kill() {
 		const killFunc = platform() === 'win32' ? this.win32Kill : this.unixKill;
 		const promises = this.ports.map(killFunc);
+
 		return Promise.all(promises);
 	}
 
 	private async win32Kill(port) {
-		const pid = await pidFromPort(port);
+		const pid = await pidFromPort(port).catch((error) => console.error('Failed to get pid of port', port, error));
+
+		if (!pid) {
+			return;
+		}
+
 		return new Promise((resolve, reject) => {
 			const taskkill = spawn('TASKKILL', ['/f', '/t', '/pid', pid.toString()]);
 			taskkill.stdout.on('data', (data) => console.log(data.toString()));

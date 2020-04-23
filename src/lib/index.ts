@@ -2,7 +2,6 @@ import { arrayifyInput, InvalidInputError, IsInputValid, mergeOptions, Options }
 import { Killer } from './killer';
 
 export async function killPortProcess(input: any, options: Options = {}) {
-
 	try {
 		const validInput = IsInputValid(input);
 
@@ -11,6 +10,7 @@ export async function killPortProcess(input: any, options: Options = {}) {
 		}
 
 		const mergedOptions = mergeOptions(options);
+
 		const toNumber = (value: string | number) => Number(value);
 		const ports = arrayifyInput(input).map(toNumber);
 
