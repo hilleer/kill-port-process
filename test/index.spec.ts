@@ -82,7 +82,7 @@ describe('index', () => {
 				expect(actualFetchErrorTwo).to.be.an.instanceOf(FetchError);
 			});
 		});
-		describe('when called with a port that is not occupied', () => {
+		describe('when called with a port with no process running on', () => {
 			let actualError: any;
 			before('kill port', async () => {
 				try {
