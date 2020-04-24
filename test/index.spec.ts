@@ -2,11 +2,36 @@ import { expect } from 'chai';
 import { spawn } from 'child_process';
 import fetch, { FetchError } from 'node-fetch';
 
-import { killPortProcess } from '../src/lib/index';
+import { arrayifyInput, killPortProcess } from '../src/lib/index';
 
 describe('index', () => {
 	describe('killPortProcess()', () => {
-		const localhost = 'http://localhost';
+		describe('when called with undefined', () => {
+			let actualError: any;
+			before(async () => {
+				try {
+					await killPortProcess(undefined);
+				} catch (error) {
+					actualError = error;
+				}
+			});
+			it('should throw an error', () => {
+				expect(actualError).to.be.an.instanceOf(Error);
+			});
+		});
+		describe('when called with null', () => {
+			let actualError: any;
+			before(async () => {
+				try {
+					await killPortProcess(null);
+				} catch (error) {
+					actualError = error;
+				}
+			});
+			it('should throw an error', () => {
+				expect(actualError).to.be.an.instanceOf(Error);
+			});
+		});
 		describe('when called with a single port', () => {
 			let actualListen: string;
 			let expectedListen: string;
@@ -22,7 +47,7 @@ describe('index', () => {
 			before('kill port, make request', async () => {
 				await killPortProcess(1234)
 					.catch((reason) => actualKillError = reason);
-				await fetch(`${localhost}:1234/`, { method: 'GET' })
+				await fetch(getLocalHost(1234), { method: 'GET' })
 					.catch((reason) => actualFetchError = reason);
 			});
 			it('should actually listen on a server', () => {
@@ -35,7 +60,7 @@ describe('index', () => {
 				expect(actualFetchError).to.be.an.instanceOf(FetchError);
 			});
 		});
-		describe('when called with multiple arguments', () => {
+		describe('when called with multiple ports', () => {
 			let actualListenOne: string;
 			let expectedListenOne: string;
 			before('start one fake server', (done) => {
@@ -61,9 +86,9 @@ describe('index', () => {
 				await killPortProcess([5678, 6789])
 					.catch((reason) => actualKillError = reason);
 				await Promise.all([
-					fetch(`${localhost}:5678/`, { method: 'GET' })
+					fetch(getLocalHost(5678), { method: 'GET' })
 						.catch((reason) => actualFetchErrorOne = reason),
-					fetch(`${localhost}:6789`, { method: 'GET' })
+					fetch(getLocalHost(6789), { method: 'GET' })
 						.catch((reason) => actualFetchErrorTwo = reason),
 				]);
 			});
@@ -76,11 +101,46 @@ describe('index', () => {
 			it('should not throw an error calling killPortProcess', () => {
 				expect(actualKillError).to.be.undefined;
 			});
-			it('should throw an error on fetch one', () => {
+			it('should throw an error on fetch one when sending a request to the terminated server', () => {
 				expect(actualFetchErrorOne).to.be.an.instanceOf(FetchError);
 			});
-			it('should throw an error on fetch two', () => {
+			it('should throw an error on fetch two when sending a request to the terminated server', () => {
 				expect(actualFetchErrorTwo).to.be.an.instanceOf(FetchError);
+			});
+		});
+		describe('when called with a port with no process running on', () => {
+			let actualError: any;
+			before('kill port', async () => {
+				try {
+					await killPortProcess(9999);
+				} catch (error) {
+					actualError = error;
+				}
+			});
+			it('should not throw an error', () => {
+				expect(actualError).to.be.undefined;
+			});
+		});
+	});
+	describe('arrayifyInput()', () => {
+		describe('when input is an array', () => {
+			it('should return as is', () => {
+				const input = [1234];
+
+				const actual = arrayifyInput(input);
+				const expected = [1234];
+
+				expect(actual).to.deep.equal(expected);
+			});
+		});
+		describe('when input is not of type array', () => {
+			it('should arrayify input', () => {
+				const input = 1234;
+
+				const actual = arrayifyInput(input);
+				const expected = [1234];
+
+				expect(actual).to.deep.equal(expected);
 			});
 		});
 	});
@@ -90,4 +150,8 @@ function startFakeServer(port: any, cb: any) {
 	const child = spawn('node', ['test/fake-server.js', port]);
 	child.stderr.on('data', (data) => console.log('ERR', data.toString()));
 	child.stdout.on('data', (data) => cb(data));
+}
+
+function getLocalHost(port: number | string) {
+	return `http://localhost:${port}`;
 }

@@ -1,16 +1,15 @@
-import { arrayifyInput, InvalidInputError, IsInputValid, mergeOptions, Options } from './helpers';
 import { Killer } from './killer';
 
-export async function killPortProcess(input: any, options: Options = {}) {
+type Input = number | number[] | string | string[];
 
+export async function killPortProcess(input: Input, options: Options = {}) {
 	try {
-		const validInput = IsInputValid(input);
-
-		if (!validInput) {
-			throw new InvalidInputError('Invalid input', input);
+		if (isNullOrUndefined(input)) {
+			throw new Error('No port(s) found');
 		}
 
 		const mergedOptions = mergeOptions(options);
+
 		const toNumber = (value: string | number) => Number(value);
 		const ports = arrayifyInput(input).map(toNumber);
 
@@ -19,4 +18,25 @@ export async function killPortProcess(input: any, options: Options = {}) {
 	} catch (error) {
 		throw error;
 	}
+}
+
+export function isNullOrUndefined(input: any) {
+	if (input === undefined || input === null) {
+		return true;
+	}
+	return false;
+}
+
+export function arrayifyInput(input) {
+	return Array.isArray(input) ? input : [input];
+}
+
+export interface Options {
+	[key: string]: string;
+}
+
+export function mergeOptions(options: Options) {
+	const defaultOptions = {};
+
+	return { ...defaultOptions, ...options };
 }
