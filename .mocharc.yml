@@ -1,0 +1,6 @@
+exit: true
+timeout: 4000
+require:
+  - ts-node/register
+allow-uncaught: true
+full-trace: true
