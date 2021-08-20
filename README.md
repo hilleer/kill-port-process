@@ -1,7 +1,6 @@
 # Kill-port-process
 
 [![npm version](https://badge.fury.io/js/kill-port-process.svg)](https://badge.fury.io/js/kill-port-process)
-[![Build Status](https://travis-ci.com/hilleer/kill-port-process.svg?branch=master)](https://travis-ci.com/hilleer/kill-port-process)
 
 **Cross-platform** module to stop one (or more) process(es) running on a port (or a list of ports).
 
