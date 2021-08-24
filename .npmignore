@@ -1,6 +1,7 @@
 src/
 test/
 examples/
+.github/
 tsconfig.json
 tslint.json
 .travis.yml

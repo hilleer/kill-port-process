@@ -6,7 +6,7 @@
 	"bin": {
 		"kill-port": "dist/bin/kill-port-process.js"
 	},
-	"typings": "index.d.ts",
+	"typings": "dist/lib/index.d.ts",
 	"scripts": {
 		"test": "mocha test/*.spec.ts",
 		"pretest": "npm run build",
@@ -21,8 +21,7 @@
 		"kill process",
 		"port",
 		"kill port",
-		"kill port process",
-		"CLI"
+		"kill port process"
 	],
 	"author": "Daniel Hillmann",
 	"license": "ISC",
@@ -52,6 +51,6 @@
 		"email": "hiller@live.dk"
 	},
 	"engines": {
-		"node": ">=10.0.0"
+		"node": ">=10"
 	}
 }

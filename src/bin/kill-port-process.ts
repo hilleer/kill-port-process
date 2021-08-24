@@ -1,5 +1,5 @@
 #! /usr/bin/env node
-import * as getThemArgs from 'get-them-args';
+const getThemArgs = require('get-them-args');
 
 import { killPortProcess } from '../lib/index';
 
@@ -15,7 +15,7 @@ import { killPortProcess } from '../lib/index';
 
 	if (!ports) {
 		console.error('No port(s) found in provided args');
-		process.exit(1);
+		return process.exit(1);
 	}
 
 	await killPortProcess(ports);
