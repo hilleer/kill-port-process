@@ -22,7 +22,6 @@
 		"port",
 		"kill port",
 		"kill port process",
-		"CLI"
 	],
 	"author": "Daniel Hillmann",
 	"license": "ISC",

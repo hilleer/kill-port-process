@@ -18,7 +18,7 @@ export class Killer {
 		return Promise.all(promises);
 	}
 
-	private async win32Kill(port) {
+	private async win32Kill(port: number) {
 		const pid = await pidFromPort(port).catch((error) => console.error('Failed to get pid of port', port, error));
 
 		if (!pid) {
@@ -34,13 +34,13 @@ export class Killer {
 					reject(`taskkill process exited with code ${code} and signal ${signal}`);
 					return;
 				}
-				resolve();
+				resolve(undefined);
 			});
 			taskkill.on('error', (err) => reject(err));
 		});
 	}
 
-	private async unixKill(port) {
+	private async unixKill(port: number) {
 		return new Promise((resolve, reject) => {
 			const lsof = spawn('lsof', ['-i', `tcp:${port}`]);
 			const grep = spawn('grep', ['LISTEN']);
@@ -63,11 +63,11 @@ export class Killer {
 					reject();
 					return;
 				}
-				resolve();
+				resolve(undefined);
 			});
 
-			function logStderrData(command) {
-				return (data) => console.error(`${command} - ${data.toString()}`);
+			function logStderrData(command: string) {
+				return (data: any) => console.error(`${command} - ${data.toString()}`);
 			}
 		});
 	}

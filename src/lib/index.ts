@@ -1,6 +1,11 @@
+import { arrayifyInput, isNullOrUndefined, mergeOptions } from './helpers';
 import { Killer } from './killer';
 
 type Input = number | number[] | string | string[];
+
+export interface Options {
+	[key: string]: string;
+}
 
 export async function killPortProcess(input: Input, options: Options = {}) {
 	try {
@@ -18,25 +23,4 @@ export async function killPortProcess(input: Input, options: Options = {}) {
 	} catch (error) {
 		throw error;
 	}
-}
-
-export function isNullOrUndefined(input: any) {
-	if (input === undefined || input === null) {
-		return true;
-	}
-	return false;
-}
-
-export function arrayifyInput(input) {
-	return Array.isArray(input) ? input : [input];
-}
-
-export interface Options {
-	[key: string]: string;
-}
-
-export function mergeOptions(options: Options) {
-	const defaultOptions = {};
-
-	return { ...defaultOptions, ...options };
 }
