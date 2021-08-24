@@ -8,19 +8,15 @@ export interface Options {
 }
 
 export async function killPortProcess(inputPorts: Ports, options: Options = {}) {
-	try {
-		if (isNullOrUndefined(inputPorts)) {
-			throw new Error('No ports found in input');
-		}
-
-		const mergedOptions = mergeOptions(options);
-
-		const toNumber = (value: string | number) => Number(value);
-		const ports = arrayifyInput(inputPorts).map(toNumber);
-
-		const killer = new Killer(ports, mergedOptions);
-		await killer.kill();
-	} catch (error) {
-		throw error;
+	if (isNullOrUndefined(inputPorts)) {
+		throw new Error('No ports found in input');
 	}
+
+	const mergedOptions = mergeOptions(options);
+
+	const toNumber = (value: string | number) => Number(value);
+	const ports = arrayifyInput(inputPorts).map(toNumber);
+
+	const killer = new Killer(ports, mergedOptions);
+	await killer.kill()
 }

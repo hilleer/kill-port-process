@@ -8,9 +8,11 @@
 	},
 	"typings": "dist/lib/index.d.ts",
 	"scripts": {
+		"build": "tsc",
+		"eslint": "eslint . --ext .ts",
+		"lint": "npm run eslint",
 		"test": "mocha test/*.spec.ts",
 		"pretest": "npm run build",
-		"build": "tsc",
 		"prepublish": "npm run build && npm test",
 		"preversion": "npm run build && npm test",
 		"postversion": "git push && git push --tags"
@@ -35,11 +37,13 @@
 		"@types/node": "11.13.4",
 		"@types/node-fetch": "2.5.0",
 		"@types/pid-from-port": "1.1.0",
+		"@typescript-eslint/eslint-plugin": "4.29.3",
+		"@typescript-eslint/parser": "4.29.3",
 		"chai": "4.3.4",
+		"eslint": "7.32.0",
 		"mocha": "8.4.0",
 		"node-fetch": "2.6.1",
 		"ts-node": "10.0.0",
-		"tslint": "5.18.0",
 		"typescript": "3.4.3"
 	},
 	"repository": {
