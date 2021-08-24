@@ -2,14 +2,15 @@ import { expect } from 'chai';
 import { spawn } from 'child_process';
 import fetch, { FetchError } from 'node-fetch';
 
-import { arrayifyInput, killPortProcess } from '../src/lib/index';
+import { killPortProcess } from '../src/lib/index';
 
-describe('index', () => {
+describe('index.spec.ts', () => {
 	describe('killPortProcess()', () => {
 		describe('when called with undefined', () => {
 			let actualError: any;
 			before(async () => {
 				try {
+					// @ts-ignore
 					await killPortProcess(undefined);
 				} catch (error) {
 					actualError = error;
@@ -23,6 +24,7 @@ describe('index', () => {
 			let actualError: any;
 			before(async () => {
 				try {
+					// @ts-ignore
 					await killPortProcess(null);
 				} catch (error) {
 					actualError = error;
@@ -36,7 +38,7 @@ describe('index', () => {
 			let actualListen: string;
 			let expectedListen: string;
 			before('start a fake server', (done) => {
-				startFakeServer(1234, (data) => {
+				startFakeServer(1234, (data: any) => {
 					actualListen = data.toString();
 					expectedListen = 'Listening on 1234';
 					done();
@@ -64,7 +66,7 @@ describe('index', () => {
 			let actualListenOne: string;
 			let expectedListenOne: string;
 			before('start one fake server', (done) => {
-				startFakeServer(5678, (data) => {
+				startFakeServer(5678, (data: any) => {
 					actualListenOne = data.toString();
 					expectedListenOne = 'Listening on 5678';
 					done();
@@ -73,7 +75,7 @@ describe('index', () => {
 			let actualListenTwo: string;
 			let expectedListenTwo: string;
 			before('start second fake server', (done) => {
-				startFakeServer(6789, (data) => {
+				startFakeServer(6789, (data: any) => {
 					actualListenTwo = data.toString();
 					expectedListenTwo = 'Listening on 6789';
 					done();
@@ -119,28 +121,6 @@ describe('index', () => {
 			});
 			it('should not throw an error', () => {
 				expect(actualError).to.be.undefined;
-			});
-		});
-	});
-	describe('arrayifyInput()', () => {
-		describe('when input is an array', () => {
-			it('should return as is', () => {
-				const input = [1234];
-
-				const actual = arrayifyInput(input);
-				const expected = [1234];
-
-				expect(actual).to.deep.equal(expected);
-			});
-		});
-		describe('when input is not of type array', () => {
-			it('should arrayify input', () => {
-				const input = 1234;
-
-				const actual = arrayifyInput(input);
-				const expected = [1234];
-
-				expect(actual).to.deep.equal(expected);
 			});
 		});
 	});

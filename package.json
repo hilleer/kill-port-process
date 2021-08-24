@@ -21,7 +21,7 @@
 		"kill process",
 		"port",
 		"kill port",
-		"kill port process",
+		"kill port process"
 	],
 	"author": "Daniel Hillmann",
 	"license": "ISC",
@@ -51,6 +51,6 @@
 		"email": "hiller@live.dk"
 	},
 	"engines": {
-		"node": ">=10.0.0"
+		"node": ">=10"
 	}
 }
