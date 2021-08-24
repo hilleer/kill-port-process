@@ -6,7 +6,7 @@
 	"bin": {
 		"kill-port": "dist/bin/kill-port-process.js"
 	},
-	"typings": "index.d.ts",
+	"typings": "dist/lib/index.d.ts",
 	"scripts": {
 		"test": "mocha test/*.spec.ts",
 		"pretest": "npm run build",
