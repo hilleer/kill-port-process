@@ -9,7 +9,7 @@
 ## Install
 
 ```bash
-$ npm install kill-port-process -E
+$ npm install kill-port-process
 # or
 $ yarn add kill-port-process
 ```
@@ -21,16 +21,21 @@ $ yarn add kill-port-process
 ```javascript
 const { killPortProcess } = require('kill-port-process');
 
-const PORT = 1234; // long-running process running on this, e.g. a http-server.
-
 (async () => {
-   await killPortProcess(PORT); // takes a number, number[], string or string[]
+    // long running process running on a given port(s), e.g. a http-server
+    // takes a number, number[], string or string[]
+    await killPortProcess(1234); // single port
+    await killPortProcess([1234, 6789]); // multiple ports
 })();
 ```
 
 ### CLI
 
-Install the module globally: `npm install kill-port-process -g`.
+Install the module globally:
+
+```bash
+npm install kill-port-process -g
+```
 
 You can use the CLI calling it with `kill-port <port>`.
 
@@ -45,4 +50,3 @@ $ kill-port -p 1234
 # or
 $ kill-port --port 1234
 ```
-
