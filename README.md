@@ -24,8 +24,10 @@ const { killPortProcess } = require('kill-port-process');
 (async () => {
     // long running process running on a given port(s), e.g. a http-server
     // takes a number, number[], string or string[]
-    await killPortProcess(1234); // single port
-    await killPortProcess([1234, 6789]); // multiple ports
+    // single port
+    await killPortProcess(1234);
+    // or multiple ports
+    await killPortProcess([1234, 6789]);
 })();
 ```
 
