@@ -57,3 +57,4 @@ $ kill-port --port 1234
 
 * `--graceful` kill the process gracefully.
   * **Unix:** Sends a `-15` signal to kill (`SIGTERM`) rather than `-9` (`SIGKILL`)
+  * **Win:** Currently no use
