@@ -11,9 +11,9 @@ export function arrayifyInput(input: any) {
 	return Array.isArray(input) ? input : [input];
 }
 
-export function mergeOptions(options: Options) {
+export function mergeOptions(options: Partial<Options>): Options {
 	const defaultOptions: Options = {
-		graceful: false
+		signal: 'SIGKILL'
 	};
 
 	return { ...defaultOptions, ...options };

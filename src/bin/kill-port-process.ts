@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 const parse = require('get-them-args');
 
-import { killPortProcess } from '../lib/index';
+import { killPortProcess, Options } from '../lib/index';
 
 (async () => {
 	const args = parse(process.argv.slice(2));
@@ -11,12 +11,7 @@ import { killPortProcess } from '../lib/index';
 		process.exit(1);
 	}
 
-	console.log('args:::', args);
-
-	console.log('parse ports....');
 	const ports = parsePortFromArgs(args);
-
-	console.log('ports::::', ports);
 
 	if (!ports) {
 		console.error('No port(s) found in provided args');
@@ -24,10 +19,9 @@ import { killPortProcess } from '../lib/index';
 	}
 
 	const flags = getFlagsFromArgs(args);
+	const options = createOptionsFromFlags(flags);
 
-	console.log('flags:.', flags);
-
-	await killPortProcess(ports);
+	await killPortProcess(ports, options);
 })();
 
 type Ports = string | number | string[] | number[];
@@ -62,4 +56,12 @@ function getFlagsFromArgs(args: Args): Flags {
 	}
 
 	return flags;
+}
+
+function createOptionsFromFlags(flags: Flags): Options {
+	const { graceful } = flags;
+
+	return {
+		signal: graceful ? 'SIGTERM' : 'SIGKILL'
+	}
 }

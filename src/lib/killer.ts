@@ -2,9 +2,7 @@ import { spawn } from 'child_process';
 import { platform } from 'os';
 import * as pidFromPort from 'pid-from-port';
 
-import { Options } from './index';
-
-type Signal = 'SIGTERM' | 'SIGKILL'
+export type Signal = 'SIGTERM' | 'SIGKILL'
 
 type KillOptions = {
 	signal: Signal;
@@ -12,10 +10,9 @@ type KillOptions = {
 
 export class Killer {
 	protected ports: number[];
-	protected options: Options;
-	constructor(ports: number[], options: Options) {
+
+	constructor(ports: number[]) {
 		this.ports = ports;
-		this.options = options;
 	}
 
 	public async kill(options: KillOptions) {

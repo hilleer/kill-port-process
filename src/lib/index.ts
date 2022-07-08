@@ -1,24 +1,24 @@
 import { arrayifyInput, isNullOrUndefined, mergeOptions } from './helpers';
-import { Killer } from './killer';
+import { Killer, Signal } from './killer';
 
 type Ports = number | number[] | string | string[];
 
 export interface Options {
-	graceful?: boolean;
+	signal: Signal
 }
 
-export async function killPortProcess(inputPorts: Ports, options: Options = {}) {
+export async function killPortProcess(inputPorts: Ports, inputOptions: Partial<Options> = {}) {
 	if (isNullOrUndefined(inputPorts)) {
 		throw new Error('No ports found in input');
 	}
 
-	const mergedOptions = mergeOptions(options);
+	const options = mergeOptions(inputOptions);
 
 	const toNumber = (value: string | number) => Number(value);
 	const ports = arrayifyInput(inputPorts).map(toNumber);
 
-	const killer = new Killer(ports, mergedOptions);
+	const killer = new Killer(ports);
 	await killer.kill({
-		signal: options.graceful ? 'SIGTERM' : 'SIGKILL'
+		signal: options.signal
 	})
 }

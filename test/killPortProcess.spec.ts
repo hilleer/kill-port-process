@@ -1,7 +1,8 @@
 import { expect } from 'chai';
 import { spawn } from 'child_process';
 
-describe.only('bin/kill-port-process', () => {
+// TODO finish
+describe('bin/kill-port-process', () => {
 	describe('when killing process', () => {
 		it('should', (done) => {
 			const args = [
