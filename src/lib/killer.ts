@@ -4,6 +4,12 @@ import * as pidFromPort from 'pid-from-port';
 
 import { Options } from './index';
 
+type Signal = 'SIGTERM' | 'SIGKILL'
+
+type KillOptions = {
+	signal: Signal;
+}
+
 export class Killer {
 	protected ports: number[];
 	protected options: Options;
@@ -12,14 +18,14 @@ export class Killer {
 		this.options = options;
 	}
 
-	public async kill() {
+	public async kill(options: KillOptions) {
 		const killFunc = platform() === 'win32' ? this.win32Kill : this.unixKill;
-		const promises = this.ports.map(killFunc);
+		const promises = this.ports.map((port) => killFunc(port, options.signal));
 
 		return Promise.all(promises);
 	}
 
-	private async win32Kill(port: number) {
+	private async win32Kill(port: number, signal: Signal) {
 		const pid = await pidFromPort(port).catch((error) => console.error('Failed to get pid of port', port, error));
 
 		if (!pid) {
@@ -41,12 +47,17 @@ export class Killer {
 		});
 	}
 
-	private async unixKill(port: number) {
+	private async unixKill(port: number, signal: Signal) {
+		const killCommand = {
+			SIGKILL: '-9',
+			SIGTERM: '-15'
+		}[signal]
+
 		return new Promise((resolve, reject) => {
 			const lsof = spawn('lsof', ['-i', `tcp:${port}`]);
 			const grep = spawn('grep', ['LISTEN']);
 			const awk = spawn('awk', ['{print $2}']);
-			const xargs = spawn('xargs', ['kill', '-9']);
+			const xargs = spawn('xargs', ['kill', killCommand]);
 
 			lsof.stdout.pipe(grep.stdin);
 			lsof.stderr.on('data', logStderrData('lsof'));

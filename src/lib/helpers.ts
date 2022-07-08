@@ -12,7 +12,9 @@ export function arrayifyInput(input: any) {
 }
 
 export function mergeOptions(options: Options) {
-	const defaultOptions = {};
+	const defaultOptions: Options = {
+		graceful: false
+	};
 
 	return { ...defaultOptions, ...options };
 }

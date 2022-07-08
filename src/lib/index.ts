@@ -4,7 +4,7 @@ import { Killer } from './killer';
 type Ports = number | number[] | string | string[];
 
 export interface Options {
-	[key: string]: string;
+	graceful?: boolean;
 }
 
 export async function killPortProcess(inputPorts: Ports, options: Options = {}) {
@@ -18,5 +18,7 @@ export async function killPortProcess(inputPorts: Ports, options: Options = {}) 
 	const ports = arrayifyInput(inputPorts).map(toNumber);
 
 	const killer = new Killer(ports, mergedOptions);
-	await killer.kill()
+	await killer.kill({
+		signal: options.graceful ? 'SIGTERM' : 'SIGKILL'
+	})
 }

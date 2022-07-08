@@ -4,7 +4,7 @@ import fetch, { FetchError } from 'node-fetch';
 
 import { killPortProcess } from '../src/lib/index';
 
-describe('index.spec.ts', () => {
+describe('lib/index', () => {
 	describe('killPortProcess()', () => {
 		describe('when called with undefined', () => {
 			let actualError: any;
