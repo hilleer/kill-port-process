@@ -22,14 +22,24 @@ $ yarn add kill-port-process
 const { killPortProcess } = require('kill-port-process');
 
 (async () => {
-    // long running process running on a given port(s), e.g. a http-server
-    // takes a number, number[], string or string[]
-    // single port
-    await killPortProcess(1234);
-    // or multiple ports
-    await killPortProcess([1234, 6789]);
+  // long running process running on a given port(s), e.g. a http-server
+  // takes a number, number[], string or string[]
+  // single port
+  await killPortProcess(1234);
+
+  // multiple ports
+  await killPortProcess([1234, 6789]);
+
+  // with options
+  await killPortProcess(1234, { signal: 'SIGTERM' });
 })();
 ```
+
+#### Options
+
+* `signal` (optional): used to determine the command used to kill the provided port(s). Valid values are:
+  * `SIGKILL` (default)
+  * `SIGTERM`
 
 ### CLI
 
