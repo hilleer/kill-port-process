@@ -58,10 +58,14 @@ function parseFlagsFromArgs(args: Args): Flags {
 	return flags;
 }
 
-function formatOptions(flags: Flags): Options {
+function formatOptions(flags: Flags): Partial<Options> {
 	const { graceful } = flags;
 
-	return {
-		signal: graceful ? 'SIGTERM' : 'SIGKILL'
+	const options: Partial<Options> = {};
+
+	if (graceful) {
+		options.signal = 'SIGTERM';
 	}
+
+	return options;
 }
