@@ -124,6 +124,34 @@ describe('lib/index', () => {
 				expect(actualError).to.be.undefined;
 			});
 		});
+
+		describe('when called with a single port and signal=SIGTERM', () => {
+			let actualListen: string;
+			let expectedListen: string;
+			before('start a fake server', (done) => startFakeServer(1234, (data: any) => {
+				actualListen = data.toString();
+				expectedListen = 'Listening on 1234';
+				done();
+			}));
+
+			let actualKillError: any;
+			let actualFetchError: FetchError;
+			before('kill port, make request', async () => {
+				await killPortProcess(1234, { signal: 'SIGTERM' })
+					.catch((reason) => actualKillError = reason);
+				await fetch(getLocalHost(1234), { method: 'GET' })
+					.catch((reason) => actualFetchError = reason);
+			});
+			it('should actually listen on a server', () => {
+				expect(actualListen).to.be.equal(expectedListen);
+			});
+			it('should not throw an error', () => {
+				expect(actualKillError).to.be.undefined;
+			});
+			it('should be true', () => {
+				expect(actualFetchError).to.be.an.instanceOf(FetchError);
+			});
+		});
 	});
 });
 
