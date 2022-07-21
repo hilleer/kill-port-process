@@ -4,3 +4,6 @@ examples/
 .github/
 tsconfig.json
 .wakatime-project
+mocharc.yml
+.eslintrc.yml
+.eslintignore

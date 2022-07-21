@@ -2,24 +2,27 @@ import { spawn } from 'child_process';
 import { platform } from 'os';
 import * as pidFromPort from 'pid-from-port';
 
-import { Options } from './index';
+export type Signal = 'SIGTERM' | 'SIGKILL'
+
+type KillOptions = {
+	signal: Signal;
+}
 
 export class Killer {
 	protected ports: number[];
-	protected options: Options;
-	constructor(ports: number[], options: Options) {
+
+	constructor(ports: number[]) {
 		this.ports = ports;
-		this.options = options;
 	}
 
-	public async kill() {
+	public async kill(options: KillOptions) {
 		const killFunc = platform() === 'win32' ? this.win32Kill : this.unixKill;
-		const promises = this.ports.map(killFunc);
+		const promises = this.ports.map((port) => killFunc(port, options.signal));
 
 		return Promise.all(promises);
 	}
 
-	private async win32Kill(port: number) {
+	private async win32Kill(port: number, signal: Signal) {
 		const pid = await pidFromPort(port).catch((error) => console.error('Failed to get pid of port', port, error));
 
 		if (!pid) {
@@ -32,21 +35,26 @@ export class Killer {
 			taskkill.stderr.on('data', (data) => console.error(data.toString()));
 			taskkill.on('close', (code, signal) => {
 				if (code !== 0) {
-					reject(`taskkill process exited with code ${code} and signal ${signal}`);
-					return;
+					return reject(`taskkill process exited with code ${code} and signal ${signal}`);
 				}
+
 				resolve(undefined);
 			});
 			taskkill.on('error', (err) => reject(err));
 		});
 	}
 
-	private async unixKill(port: number) {
+	private async unixKill(port: number, signal: Signal) {
+		const killCommand = {
+			SIGKILL: '-9',
+			SIGTERM: '-15'
+		}[signal]
+
 		return new Promise((resolve, reject) => {
 			const lsof = spawn('lsof', ['-i', `tcp:${port}`]);
 			const grep = spawn('grep', ['LISTEN']);
 			const awk = spawn('awk', ['{print $2}']);
-			const xargs = spawn('xargs', ['kill', '-9']);
+			const xargs = spawn('xargs', ['kill', killCommand]);
 
 			lsof.stdout.pipe(grep.stdin);
 			lsof.stderr.on('data', logStderrData('lsof'));
@@ -61,9 +69,9 @@ export class Killer {
 			xargs.stderr.on('data', logStderrData('xargs'));
 			xargs.on('close', (code) => {
 				if (code !== 0) {
-					reject();
-					return;
+					return reject();
 				}
+
 				resolve(undefined);
 			});
 
