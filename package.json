@@ -13,7 +13,7 @@
 		"lint": "npm run eslint",
 		"test": "mocha test/*.spec.ts",
 		"pretest": "npm run build",
-		"prepublish": "npm run build && npm test",
+		"prepare": "npm run build && npm test",
 		"preversion": "npm run build && npm test",
 		"postversion": "git push && git push --tags"
 	},
@@ -55,6 +55,6 @@
 		"email": "hiller@live.dk"
 	},
 	"engines": {
-		"node": ">=10"
+		"node": ">=14"
 	}
 }
