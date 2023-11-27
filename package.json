@@ -32,19 +32,19 @@
 		"pid-from-port": "1.1.3"
 	},
 	"devDependencies": {
-		"@types/chai": "4.3.10",
+		"@types/chai": "4.3.11",
 		"@types/mocha": "10.0.6",
-		"@types/node": "20.9.2",
+		"@types/node": "20.10.0",
 		"@types/node-fetch": "2.6.6",
 		"@types/pid-from-port": "1.1.2",
-		"@typescript-eslint/eslint-plugin": "4.33.0",
-		"@typescript-eslint/parser": "4.33.0",
+		"@typescript-eslint/eslint-plugin": "6.12.0",
+		"@typescript-eslint/parser": "6.12.0",
 		"chai": "4.3.10",
-		"eslint": "7.32.0",
+		"eslint": "8.54.0",
 		"mocha": "10.2.0",
 		"node-fetch": "2.7.0",
 		"ts-node": "10.9.1",
-		"typescript": "5.2.2"
+		"typescript": "5.3.2"
 	},
 	"repository": {
 		"type": "git",
