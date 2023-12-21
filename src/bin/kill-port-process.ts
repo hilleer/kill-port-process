@@ -18,8 +18,8 @@ import { killPortProcess, Options } from '../lib/index';
 		return process.exit(1);
 	}
 
-	const flags = getFlagsFromArgs(args);
-	const options = createOptionsFromFlags(flags);
+	const flags = parseFlagsFromArgs(args);
+	const options = formatOptions(flags);
 
 	await killPortProcess(ports, options);
 })();
@@ -48,7 +48,7 @@ type Flags = {
 	graceful?: boolean;
 }
 
-function getFlagsFromArgs(args: Args): Flags {
+function parseFlagsFromArgs(args: Args): Flags {
 	const flags: Flags = {};
 
 	if (args.graceful) {
@@ -58,10 +58,14 @@ function getFlagsFromArgs(args: Args): Flags {
 	return flags;
 }
 
-function createOptionsFromFlags(flags: Flags): Options {
+function formatOptions(flags: Flags): Partial<Options> {
 	const { graceful } = flags;
 
-	return {
-		signal: graceful ? 'SIGTERM' : 'SIGKILL'
+	const options: Partial<Options> = {};
+
+	if (graceful) {
+		options.signal = 'SIGTERM';
 	}
+
+	return options;
 }

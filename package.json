@@ -1,6 +1,6 @@
 {
 	"name": "kill-port-process",
-	"version": "3.0.1",
+	"version": "3.2.1",
 	"description": "Easily kill hanging processes on ports - on any platform!",
 	"main": "dist/lib/index.js",
 	"bin": {
@@ -13,7 +13,7 @@
 		"lint": "npm run eslint",
 		"test": "mocha test/*.spec.ts",
 		"pretest": "npm run build",
-		"prepublish": "npm run build && npm test",
+		"prepare": "npm run build && npm test",
 		"preversion": "npm run build && npm test",
 		"postversion": "git push && git push --tags"
 	},
@@ -32,19 +32,19 @@
 		"pid-from-port": "1.1.3"
 	},
 	"devDependencies": {
-		"@types/chai": "4.2.18",
-		"@types/mocha": "8.2.2",
-		"@types/node": "11.13.4",
-		"@types/node-fetch": "2.5.0",
-		"@types/pid-from-port": "1.1.0",
-		"@typescript-eslint/eslint-plugin": "4.29.3",
-		"@typescript-eslint/parser": "4.29.3",
-		"chai": "4.3.4",
-		"eslint": "7.32.0",
-		"mocha": "9.2.0",
-		"node-fetch": "2.6.7",
-		"ts-node": "10.0.0",
-		"typescript": "4.3.5"
+		"@types/chai": "4.3.11",
+		"@types/mocha": "10.0.6",
+		"@types/node": "20.10.5",
+		"@types/node-fetch": "2.6.6",
+		"@types/pid-from-port": "1.1.2",
+		"@typescript-eslint/eslint-plugin": "6.14.0",
+		"@typescript-eslint/parser": "6.14.0",
+		"chai": "4.3.10",
+		"eslint": "8.56.0",
+		"mocha": "10.2.0",
+		"node-fetch": "2.7.0",
+		"ts-node": "10.9.2",
+		"typescript": "5.3.3"
 	},
 	"repository": {
 		"type": "git",

@@ -35,16 +35,16 @@ export class Killer {
 			taskkill.stderr.on('data', (data) => console.error(data.toString()));
 			taskkill.on('close', (code, signal) => {
 				if (code !== 0) {
-					reject(`taskkill process exited with code ${code} and signal ${signal}`);
-					return;
+					return reject(`taskkill process exited with code ${code} and signal ${signal}`);
 				}
+
 				resolve(undefined);
 			});
 			taskkill.on('error', (err) => reject(err));
 		});
 	}
 
-	private async unixKill(port: number, signal: Signal): Promise<void> {
+	private async unixKill(port: number, signal: Signal) {
 		const killCommand = {
 			SIGKILL: '-9',
 			SIGTERM: '-15'
@@ -69,9 +69,9 @@ export class Killer {
 			xargs.stderr.on('data', logStderrData('xargs'));
 			xargs.on('close', (code) => {
 				if (code !== 0) {
-					reject();
-					return;
+					return reject();
 				}
+
 				resolve(undefined);
 			});
 

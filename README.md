@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/kill-port-process.svg)](https://badge.fury.io/js/kill-port-process)
 [![Node.js CI](https://github.com/hilleer/kill-port-process/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/hilleer/kill-port-process/actions/workflows/node.js.yml)
-[![CodeQL](https://github.com/hilleer/kill-port-process/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/hilleer/kill-port-process/actions/workflows/codeql-analysis.yml)
+[![CodeQL](https://github.com/hilleer/kill-port-process/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/hilleer/kill-port-process/actions/workflows/github-code-scanning/codeql)
 
 **Cross-platform** module to stop one (or more) process(es) running on a port (or a list of ports).
 
@@ -22,14 +22,24 @@ $ yarn add kill-port-process
 const { killPortProcess } = require('kill-port-process');
 
 (async () => {
-    // long running process running on a given port(s), e.g. a http-server
-    // takes a number, number[], string or string[]
-    // single port
-    await killPortProcess(1234);
-    // or multiple ports
-    await killPortProcess([1234, 6789]);
+  // long running process running on a given port(s), e.g. a http-server
+  // takes a number, number[], string or string[]
+  // single port
+  await killPortProcess(1234);
+
+  // multiple ports
+  await killPortProcess([1234, 6789]);
+
+  // with options
+  await killPortProcess(1234, { signal: 'SIGTERM' });
 })();
 ```
+
+#### Options
+
+* `signal` (optional): used to determine the command used to kill the provided port(s). Valid values are:
+  * `SIGKILL` (default)
+  * `SIGTERM`
 
 ### CLI
 
@@ -58,3 +68,7 @@ $ kill-port --port 1234
 * `--graceful` kill the process gracefully.
   * **Unix:** Sends a `-15` signal to kill (`SIGTERM`) rather than `-9` (`SIGKILL`)
   * **Win:** Currently no use
+
+---
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/hilleer)
