@@ -18,7 +18,6 @@ export async function killPortProcess(inputPorts: Ports, inputOptions: Partial<O
 	const ports = arrayifyInput(inputPorts).map(toNumber);
 
 	const killer = new Killer(ports);
-
 	await killer.kill({
 		signal: options.signal
 	})
