@@ -6,7 +6,7 @@
 	"bin": {
 		"kill-port": "dist/bin/kill-port-process.js"
 	},
-	"typings": "dist/lib/index.d.ts",
+	"types": "dist/lib/index.d.ts",
 	"scripts": {
 		"build": "tsc",
 		"eslint": "eslint . --ext .ts",
@@ -55,6 +55,7 @@
 		"email": "hiller@live.dk"
 	},
 	"engines": {
-		"node": ">=10"
+		"node": ">=18",
+		"npm": ">=9"
 	}
 }

@@ -44,7 +44,7 @@ export class Killer {
 		});
 	}
 
-	private async unixKill(port: number, signal: Signal) {
+	private async unixKill(port: number, signal: Signal): Promise<void> {
 		const killCommand = {
 			SIGKILL: '-9',
 			SIGTERM: '-15'
