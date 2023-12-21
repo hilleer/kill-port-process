@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import fetch, { FetchError } from 'node-fetch';
 
 import { killPortProcess } from '../src/lib/index';
 import { startFakeServer } from './helpers';
@@ -46,7 +45,7 @@ describe('lib/index', () => {
 			}));
 
 			let actualKillError: any;
-			let actualFetchError: FetchError;
+			let actualFetchError: any;
 			before('kill port, make request', async () => {
 				await killPortProcess(1234)
 					.catch((reason) => actualKillError = reason);
@@ -60,7 +59,10 @@ describe('lib/index', () => {
 				expect(actualKillError).to.be.undefined;
 			});
 			it('should be true', () => {
-				expect(actualFetchError).to.be.an.instanceOf(FetchError);
+				expect(actualFetchError)
+					.to.be.an.instanceOf(TypeError)
+					.that.nested.property('cause.code')
+					.that.equal('ECONNREFUSED');
 			});
 		});
 
@@ -82,8 +84,8 @@ describe('lib/index', () => {
 			}));
 
 			let actualKillError: any;
-			let actualFetchErrorOne: FetchError;
-			let actualFetchErrorTwo: FetchError;
+			let actualFetchErrorOne: any;
+			let actualFetchErrorTwo: any;
 			before('kill port, make request', async () => {
 				await killPortProcess([5678, 6789])
 					.catch((reason) => actualKillError = reason);
@@ -104,10 +106,16 @@ describe('lib/index', () => {
 				expect(actualKillError).to.be.undefined;
 			});
 			it('should throw an error on fetch one when sending a request to the terminated server', () => {
-				expect(actualFetchErrorOne).to.be.an.instanceOf(FetchError);
+				expect(actualFetchErrorOne)
+					.to.be.an.instanceOf(TypeError)
+					.that.nested.property('cause.code')
+					.that.equal('ECONNREFUSED');
 			});
 			it('should throw an error on fetch two when sending a request to the terminated server', () => {
-				expect(actualFetchErrorTwo).to.be.an.instanceOf(FetchError);
+				expect(actualFetchErrorTwo)
+					.to.be.an.instanceOf(TypeError)
+					.that.nested.property('cause.code')
+					.that.equal('ECONNREFUSED');
 			});
 		});
 
@@ -135,7 +143,7 @@ describe('lib/index', () => {
 			}));
 
 			let actualKillError: any;
-			let actualFetchError: FetchError;
+			let actualFetchError: any;
 			before('kill port, make request', async () => {
 				await killPortProcess(1234, { signal: 'SIGTERM' })
 					.catch((reason) => actualKillError = reason);
@@ -149,7 +157,10 @@ describe('lib/index', () => {
 				expect(actualKillError).to.be.undefined;
 			});
 			it('should be true', () => {
-				expect(actualFetchError).to.be.an.instanceOf(FetchError);
+				expect(actualFetchError)
+					.to.be.an.instanceOf(TypeError)
+					.that.nested.property('cause.code')
+					.that.equal('ECONNREFUSED');1
 			});
 		});
 	});
