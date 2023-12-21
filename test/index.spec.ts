@@ -35,7 +35,7 @@ describe('lib/index', () => {
 			});
 		});
 
-		describe.only('when called with a single port', () => {
+		describe('when called with a single port', () => {
 			let actualListen: string;
 			let expectedListen: string;
 			before('start a fake server', (done) => startFakeServer(1234, (data: any) => {
