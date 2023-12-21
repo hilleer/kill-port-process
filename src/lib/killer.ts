@@ -67,13 +67,15 @@ export class Killer {
 
 			xargs.stdout.pipe(process.stdin);
 			xargs.stderr.on('data', logStderrData('xargs'));
-			xargs.on('close', (code) => {
+			xargs.on('exit', (code) => {
 				if (code !== 0) {
 					return reject();
 				}
 
 				resolve(undefined);
 			});
+
+			xargs.on('error', (err) => reject(err));
 
 			function logStderrData(command: string) {
 				return (data: any) => console.error(`${command} - ${data.toString()}`);

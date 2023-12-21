@@ -1,3 +1,4 @@
 timeout: 4000
 require:
   - ts-node/register
+full-trace: true
