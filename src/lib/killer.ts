@@ -64,15 +64,12 @@ export class Killer {
 
 			lsof.stdout.pipe(grep.stdin);
 			lsof.stderr.on('data', logStderrData('lsof'));
-			lsof.on('error', (err) => reject(err));
 
 			grep.stdout.pipe(awk.stdin);
 			grep.stderr.on('data', logStderrData('grep'));
-			grep.on('error', (err) => reject(err));
 
 			awk.stdout.pipe(xargs.stdin);
 			awk.stderr.on('data', logStderrData('awk'));
-			awk.on('error', (err) => reject(err));
 
 			xargs.stdout.pipe(process.stdin);
 			xargs.stderr.on('data', logStderrData('xargs'));
