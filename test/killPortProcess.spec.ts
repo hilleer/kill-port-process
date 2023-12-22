@@ -39,8 +39,14 @@ function killProcess(flags: string[] = []) {
 	const child = spawn('node', args);
 
 	return new Promise((resolve, reject) => {
-		child.on('close', (code, signal) => resolve({ message: 'closed', code }));
-		child.on('exit', (code, signal) => resolve({ message: 'closed', code }));
+		const resolveWithResult = (code: any, signal: any) => resolve({
+			message: 'closed',
+			code,
+			...(signal && { signal })
+		});
+
+		child.on('close', resolveWithResult);
+		child.on('exit', resolveWithResult);
 		child.on('error', (err) => reject(err));
 	});
 

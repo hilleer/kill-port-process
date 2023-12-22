@@ -1,6 +1,7 @@
 import { spawn } from 'child_process';
 import { platform } from 'os';
 import * as pidFromPort from 'pid-from-port';
+import createDebug, { Debugger } from 'debug';
 
 export type Signal = 'SIGTERM' | 'SIGKILL'
 
@@ -9,14 +10,19 @@ type KillOptions = {
 }
 
 export class Killer {
-	protected ports: number[];
+	private readonly ports: number[];
+	private readonly debug: Debugger;
 
 	constructor(ports: number[]) {
 		this.ports = ports;
+		this.debug = createDebug('kill-port-process');
 	}
 
 	public async kill(options: KillOptions) {
 		const killFunc = platform() === 'win32' ? this.win32Kill : this.unixKill;
+
+		this.debug('kill func selected:', killFunc.name);
+
 		const promises = this.ports.map((port) => killFunc(port, options.signal));
 
 		return Promise.all(promises);
@@ -58,24 +64,28 @@ export class Killer {
 
 			lsof.stdout.pipe(grep.stdin);
 			lsof.stderr.on('data', logStderrData('lsof'));
+			lsof.on('error', (err) => reject(err));
 
 			grep.stdout.pipe(awk.stdin);
 			grep.stderr.on('data', logStderrData('grep'));
+			grep.on('error', (err) => reject(err));
 
 			awk.stdout.pipe(xargs.stdin);
 			awk.stderr.on('data', logStderrData('awk'));
+			awk.on('error', (err) => reject(err));
 
 			xargs.stdout.pipe(process.stdin);
 			xargs.stderr.on('data', logStderrData('xargs'));
+			xargs.on('error', (err) => reject(err));
+
 			xargs.on('exit', (code) => {
 				if (code !== 0) {
-					return reject();
+					return reject(new Error(`xargs process exited with code ${code}`));
 				}
 
 				resolve(undefined);
 			});
 
-			xargs.on('error', (err) => reject(err));
 
 			function logStderrData(command: string) {
 				return (data: any) => console.error(`${command} - ${data.toString()}`);
