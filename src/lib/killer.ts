@@ -76,7 +76,6 @@ export class Killer {
 
 			xargs.stdout.pipe(process.stdin);
 			xargs.stderr.on('data', logStderrData('xargs'));
-			xargs.on('error', (err) => reject(err));
 
 			xargs.on('exit', (code) => {
 				if (code !== 0) {
