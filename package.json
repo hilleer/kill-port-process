@@ -11,11 +11,11 @@
 		"build": "tsc",
 		"eslint": "eslint . --ext .ts",
 		"lint": "npm run eslint",
+		"git-tags": "git push && git push --tags",
 		"test": "mocha test/*.spec.ts",
 		"pretest": "npm run build",
 		"prepare": "npm run build && npm test",
-		"preversion": "npm run build && npm test",
-		"postversion": "git push && git push --tags"
+		"preversion": "npm run build && npm test"
 	},
 	"keywords": [
 		"process",
