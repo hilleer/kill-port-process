@@ -1,7 +1,6 @@
 import { spawn } from 'child_process';
 import { platform } from 'os';
 import * as pidFromPort from 'pid-from-port';
-import createDebug, { Debugger } from 'debug';
 
 export type Signal = 'SIGTERM' | 'SIGKILL'
 
@@ -11,17 +10,13 @@ type KillOptions = {
 
 export class Killer {
 	private readonly ports: number[];
-	private readonly debug: Debugger;
 
 	constructor(ports: number[]) {
 		this.ports = ports;
-		this.debug = createDebug('kill-port-process');
 	}
 
 	public async kill(options: KillOptions) {
 		const killFunc = platform() === 'win32' ? this.win32Kill : this.unixKill;
-
-		this.debug('kill func selected:', killFunc.name);
 
 		const promises = this.ports.map((port) => killFunc(port, options.signal));
 
