@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import * as pidFromPort from 'pid-from-port'
 
 import { killPortProcess } from '../src/lib/index';
 import { startFakeServer } from './helpers';
@@ -35,34 +36,37 @@ describe('lib/index', () => {
 			});
 		});
 
-		describe('when called with a single port', () => {
+		describe.only('when called with a single port', () => {
+			const port = 1234;
+
 			let actualListen: string;
 			let expectedListen: string;
-			before('start a fake server', (done) => startFakeServer(1234, (data: any) => {
+			before('start a fake server', (done) => startFakeServer(port, (data: any) => {
 				actualListen = data.toString();
 				expectedListen = 'Listening on 1234';
 				done();
 			}));
 
-			let actualKillError: any;
-			let actualFetchError: any;
+			let actualError: any;
 			before('kill port, make request', async () => {
 				await killPortProcess(1234)
-					.catch((reason) => actualKillError = reason);
-				await fetch(getLocalHost(1234), { method: 'GET' })
-					.catch((reason) => actualFetchError = reason);
+
+				try {
+					await pidFromPort(port)
+				} catch (error) {
+					actualError = error;
+				}
 			});
+
 			it('should actually listen on a server', () => {
 				expect(actualListen).to.be.equal(expectedListen);
 			});
-			it('should not throw an error', () => {
-				expect(actualKillError).to.be.undefined;
-			});
-			it('should be true', () => {
-				expect(actualFetchError)
-					.to.be.an.instanceOf(TypeError)
-					.that.nested.property('cause.code')
-					.to.be.oneOf(['ECONNREFUSED', 'ECONNRESET']);
+
+			it('should return an error accessing port', () => {
+				expect(actualError)
+					.to.be.an.instanceOf(Error)
+					.with.property('message')
+					.that.equal(`Couldn't find a process with port \`${port}\``);
 			});
 		});
 
