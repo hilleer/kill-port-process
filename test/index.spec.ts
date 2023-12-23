@@ -36,7 +36,7 @@ describe('lib/index', () => {
 			});
 		});
 
-		describe.only('when called with a single port', () => {
+		describe('when called with a single port', () => {
 			const port = 1234;
 
 			let actualListen: string;
@@ -47,7 +47,7 @@ describe('lib/index', () => {
 				done();
 			}));
 
-			let actualError: any;
+			let actualError: unknown;
 			before('kill port, make request', async () => {
 				await killPortProcess(1234)
 
@@ -87,39 +87,36 @@ describe('lib/index', () => {
 				done();
 			}));
 
-			let actualKillError: any;
-			let actualFetchErrorOne: any;
-			let actualFetchErrorTwo: any;
+			let actualErrors: string[];
 			before('kill port, make request', async () => {
-				await killPortProcess([5678, 6789])
-					.catch((reason) => actualKillError = reason);
-				await Promise.all([
-					fetch(getLocalHost(5678), { method: 'GET' })
-						.catch((reason) => actualFetchErrorOne = reason),
-					fetch(getLocalHost(6789), { method: 'GET' })
-						.catch((reason) => actualFetchErrorTwo = reason),
-				]);
+				await killPortProcess([5678, 6789]);
+
+				const res = await Promise.allSettled([pidFromPort(5678), pidFromPort(6789)]);
+				actualErrors = res.reduce<string[]>((acc, cur) => {
+					if (cur.status === 'rejected') {
+						acc.push(cur.reason.message);
+					}
+
+					return acc;
+				}, []);
 			});
+
 			it('should actually listen on server one', () => {
 				expect(actualListenOne).to.equal(expectedListenOne);
 			});
 			it('should actually listen on server two', () => {
 				expect(actualListenTwo).to.equal(expectedListenTwo);
 			});
-			it('should not throw an error calling killPortProcess', () => {
-				expect(actualKillError).to.be.undefined;
-			});
+
 			it('should throw an error on fetch one when sending a request to the terminated server', () => {
-				expect(actualFetchErrorOne)
-					.to.be.an.instanceOf(TypeError)
-					.that.nested.property('cause.code')
-					.to.be.oneOf(['ECONNREFUSED', 'ECONNRESET']);
-			});
-			it('should throw an error on fetch two when sending a request to the terminated server', () => {
-				expect(actualFetchErrorTwo)
-					.to.be.an.instanceOf(TypeError)
-					.that.nested.property('cause.code')
-					.to.be.oneOf(['ECONNREFUSED', 'ECONNRESET']);
+				const expected = [
+					"Couldn't find a process with port `5678`",
+					"Couldn't find a process with port `6789`",
+				];
+
+				expect(actualErrors)
+					.to.have.lengthOf(2)
+					.that.deep.equal(expected);
 			});
 		});
 
@@ -138,38 +135,37 @@ describe('lib/index', () => {
 		});
 
 		describe('when called with a single port and signal=SIGTERM', () => {
+			const port = 1234;
+
 			let actualListen: string;
 			let expectedListen: string;
+
 			before('start a fake server', (done) => startFakeServer(1234, (data: any) => {
 				actualListen = data.toString();
 				expectedListen = 'Listening on 1234';
 				done();
 			}));
 
-			let actualKillError: any;
-			let actualFetchError: any;
+			let actualPortError: any;
 			before('kill port, make request', async () => {
-				await killPortProcess(1234, { signal: 'SIGTERM' })
-					.catch((reason) => actualKillError = reason);
-				await fetch(getLocalHost(1234), { method: 'GET' })
-					.catch((reason) => actualFetchError = reason);
+				await killPortProcess(port, { signal: 'SIGTERM' });
+				try {
+					await pidFromPort(port);
+				} catch (error) {
+					actualPortError = error;
+				}
 			});
+
 			it('should actually listen on a server', () => {
 				expect(actualListen).to.be.equal(expectedListen);
 			});
-			it('should not throw an error', () => {
-				expect(actualKillError).to.be.undefined;
-			});
+
 			it('should be true', () => {
-				expect(actualFetchError)
-					.to.be.an.instanceOf(TypeError)
-					.that.nested.property('cause.code')
-					.to.be.oneOf(['ECONNREFUSED', 'ECONNRESET']);
+				expect(actualPortError)
+					.to.be.an.instanceOf(Error)
+					.that.property('message')
+					.that.equal(`Couldn't find a process with port \`${port}\``);
 			});
 		});
 	});
 });
-
-function getLocalHost(port: number | string) {
-	return `http://localhost:${port}`;
-}
