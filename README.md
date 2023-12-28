@@ -75,4 +75,4 @@ $ kill-port --port 1234
 
 ## Compatibility
 
-Compiled for https://compat-table.github.io/compat-table/es5/ and supported by node v16 and onwards.
+Compiled for [es5](https://compat-table.github.io/compat-table/es5) and supported by node v16 and onwards.
