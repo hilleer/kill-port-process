@@ -69,6 +69,10 @@ $ kill-port --port 1234
   * **Unix:** Sends a `-15` signal to kill (`SIGTERM`) rather than `-9` (`SIGKILL`)
   * **Win:** Currently no use
 
+## Compatibility
+
+Compiled for [es5](https://compat-table.github.io/compat-table/es5) and supported by node v16 and onwards.
+
 ---
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/hilleer)
