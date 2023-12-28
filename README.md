@@ -51,16 +51,14 @@ npm install kill-port-process -g
 
 You can use the CLI calling it with `kill-port <port>`.
 
-It takes a single port or a list of ports separated by a space. Valid flags are `-p` and `--port` but are both optional.
-
 ```bash
 # single port
 $ kill-port 1234
-# or multiple ports, separated by space(s)
+# multiple ports, separated by space(s)
 $ kill-port 1234 2345
-# or
+# with "-p" flag
 $ kill-port -p 1234
-# or
+# with with "--port" flag
 $ kill-port --port 1234
 # with graceful flag
 $ kill-port 1234 --graceful
@@ -68,7 +66,8 @@ $ kill-port 1234 --graceful
 
 #### Flags
 
-* `--graceful` kill the process gracefully.
+* `-p` or `--port` (optional): used to specify the port(s) to kill. Takes a single port or a list of ports separated by a space.
+* `--graceful` (optional) kill the process gracefully.
   * **Unix:** Sends a `-15` signal to kill (`SIGTERM`) rather than `-9` (`SIGKILL`)
   * **Win:** Currently no use
 
