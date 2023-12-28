@@ -54,6 +54,7 @@ You can use the CLI calling it with `kill-port <port>`.
 It takes a single port or a list of ports separated by a space. Valid flags are `-p` and `--port` but are both optional.
 
 ```bash
+# single port
 $ kill-port 1234
 # or multiple ports, separated by space(s)
 $ kill-port 1234 2345
@@ -61,6 +62,8 @@ $ kill-port 1234 2345
 $ kill-port -p 1234
 # or
 $ kill-port --port 1234
+# with graceful flag
+$ kill-port 1234 --graceful
 ```
 
 #### Flags
