@@ -72,3 +72,7 @@ $ kill-port --port 1234
 ---
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/hilleer)
+
+## Compatibility
+
+Compiled for https://compat-table.github.io/compat-table/es5/ and supported by node v16 and onwards.
