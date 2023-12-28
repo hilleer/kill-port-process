@@ -78,12 +78,14 @@ export class Killer {
 				resolve(undefined);
 			});
 
+			/**
+			 * @see https://www.commandlinux.com/man-page/man1/xargs.1.html for possible exit codes
+			 */
 			function handleErrorCode(code: number | null) {
 				if (!code) {
 					return null;
 				}
 
-				// see possible exit codes: https://www.commandlinux.com/man-page/man1/xargs.1.html
 				switch (code) {
 					case 1:
 						return new Error(`xargs process exited with code ${code}`)
