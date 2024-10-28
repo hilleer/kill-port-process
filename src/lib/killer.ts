@@ -9,7 +9,7 @@ type KillOptions = {
 }
 
 export class Killer {
-	protected ports: number[];
+	private readonly ports: number[];
 
 	constructor(ports: number[]) {
 		this.ports = ports;
@@ -17,12 +17,13 @@ export class Killer {
 
 	public async kill(options: KillOptions) {
 		const killFunc = platform() === 'win32' ? this.win32Kill : this.unixKill;
+
 		const promises = this.ports.map((port) => killFunc(port, options.signal));
 
 		return Promise.all(promises);
 	}
 
-	private async win32Kill(port: number, signal: Signal) {
+	private async win32Kill(port: number) {
 		const pid = await pidFromPort(port).catch((error) => console.error('Failed to get pid of port', port, error));
 
 		if (!pid) {
@@ -67,13 +68,31 @@ export class Killer {
 
 			xargs.stdout.pipe(process.stdin);
 			xargs.stderr.on('data', logStderrData('xargs'));
-			xargs.on('close', (code) => {
-				if (code !== 0) {
-					return reject();
+
+			xargs.on('exit', (code) => {
+				const error = handleErrorCode(code);
+				if (error) {
+					reject(error);
 				}
 
 				resolve(undefined);
 			});
+
+			/**
+			 * @see https://www.commandlinux.com/man-page/man1/xargs.1.html for possible exit codes
+			 */
+			function handleErrorCode(code: number | null) {
+				if (!code) {
+					return null;
+				}
+
+				switch (code) {
+					case 1:
+						return new Error(`xargs process exited with code ${code}`)
+					case 127:
+						return new Error('xargs command not found');
+				}
+			}
 
 			function logStderrData(command: string) {
 				return (data: any) => console.error(`${command} - ${data.toString()}`);
