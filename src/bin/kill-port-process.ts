@@ -21,6 +21,9 @@ import { killPortProcess, Options } from '../lib/index';
 	const flags = parseFlagsFromArgs(args);
 	const options = formatOptions(flags);
 
+	console.log('flags::', flags);
+	console.log('options::', options);
+
 	await killPortProcess(ports, options);
 })();
 
