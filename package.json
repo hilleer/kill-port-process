@@ -1,6 +1,6 @@
 {
 	"name": "kill-port-process",
-	"version": "3.2.1",
+	"version": "4.0.0-beta.0",
 	"description": "Easily kill hanging processes on ports - on any platform!",
 	"main": "dist/lib/index.js",
 	"bin": {
@@ -11,11 +11,11 @@
 		"build": "tsc",
 		"eslint": "eslint . --ext .ts",
 		"lint": "npm run eslint",
+		"git-tags": "git push && git push --tags",
 		"test": "mocha test/*.spec.ts",
 		"pretest": "npm run build",
 		"prepare": "npm run build && npm test",
-		"preversion": "npm run build && npm test",
-		"postversion": "git push && git push --tags"
+		"preversion": "npm run build && npm test"
 	},
 	"keywords": [
 		"process",
