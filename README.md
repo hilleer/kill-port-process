@@ -40,6 +40,7 @@ const { killPortProcess } = require('kill-port-process');
 * `signal` (optional): used to determine the command used to kill the provided port(s). Valid values are:
   * `SIGKILL` (default)
   * `SIGTERM`
+* `silent` (optional): suppresses the output of the command regardless of the result. takes a boolean, default is `false`.
 
 ### CLI
 
