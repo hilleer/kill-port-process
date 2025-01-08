@@ -13,7 +13,8 @@ export function arrayifyInput(input: any) {
 
 export function mergeOptions(options: Partial<Options>): Options {
 	const defaultOptions: Options = {
-		signal: 'SIGKILL'
+		signal: 'SIGKILL',
+		silent: false
 	};
 
 	return { ...defaultOptions, ...options };

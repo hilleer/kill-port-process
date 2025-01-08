@@ -30,6 +30,7 @@ interface Args {
 	port?: Ports;
 	unknown?: Ports;
 	graceful?: boolean;
+	silent?: boolean;
 }
 
 function parsePortFromArgs(args: Args) {
@@ -46,6 +47,7 @@ function parsePortFromArgs(args: Args) {
 
 type Flags = {
 	graceful?: boolean;
+	silent?: boolean;
 }
 
 function parseFlagsFromArgs(args: Args): Flags {
@@ -55,16 +57,24 @@ function parseFlagsFromArgs(args: Args): Flags {
 		flags.graceful = true;
 	}
 
+	if (args.silent) {
+		flags.silent = true;
+	}
+
 	return flags;
 }
 
 function formatOptions(flags: Flags): Partial<Options> {
-	const { graceful } = flags;
+	const { graceful, silent } = flags;
 
 	const options: Partial<Options> = {};
 
 	if (graceful) {
 		options.signal = 'SIGTERM';
+	}
+
+	if (silent) {
+		options.silent = silent;
 	}
 
 	return options;
