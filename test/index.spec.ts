@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import * as pidFromPort from 'pid-from-port'
+import { portToPid } from 'pid-port';
 
 import { killPortProcess } from '../src/lib/index';
 import { startFakeServer } from './helpers';
@@ -52,7 +52,7 @@ describe('lib/index', () => {
 				await killPortProcess(1234)
 
 				try {
-					await pidFromPort(port)
+					await portToPid(port)
 				} catch (error) {
 					actualError = error;
 				}
@@ -91,7 +91,7 @@ describe('lib/index', () => {
 			before('kill port, make request', async () => {
 				await killPortProcess([5678, 6789]);
 
-				const res = await Promise.allSettled([pidFromPort(5678), pidFromPort(6789)]);
+				const res = await Promise.allSettled([portToPid(5678), portToPid(6789)]);
 				actualErrors = res.reduce<string[]>((acc, cur) => {
 					if (cur.status === 'rejected') {
 						acc.push(cur.reason.message);
@@ -150,7 +150,7 @@ describe('lib/index', () => {
 			before('kill port, make request', async () => {
 				await killPortProcess(port, { signal: 'SIGTERM' });
 				try {
-					await pidFromPort(port);
+					await portToPid(port);
 				} catch (error) {
 					actualPortError = error;
 				}
