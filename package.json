@@ -29,13 +29,12 @@
 	"license": "ISC",
 	"dependencies": {
 		"get-them-args": "1.3.2",
-		"pid-from-port": "1.1.3"
+		"pid-port": "^1.0.2"
 	},
 	"devDependencies": {
 		"@types/chai": "4.3.17",
 		"@types/mocha": "10.0.10",
 		"@types/node": "22.10.7",
-		"@types/pid-from-port": "1.1.2",
 		"@typescript-eslint/eslint-plugin": "8.20.0",
 		"@typescript-eslint/parser": "8.20.0",
 		"chai": "4.5.0",
