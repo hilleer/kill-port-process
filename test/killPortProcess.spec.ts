@@ -27,6 +27,16 @@ describe('bin/kill-port-process', () => {
 			expect(actual).to.deep.equal(expected)
 		});
 	});
+
+	describe('when killing process of non-existent port', () => {
+		it('should throw an error', () => {
+			// TODO
+		});
+
+		it('should be silent when silent flag is set', async () => {
+			// TODO
+		});
+	});
 });
 
 function killProcess(flags: string[] = []) {
