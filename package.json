@@ -34,13 +34,13 @@
 	"devDependencies": {
 		"@types/chai": "4.3.17",
 		"@types/mocha": "10.0.10",
-		"@types/node": "22.15.29",
+		"@types/node": "22.15.30",
 		"@types/pid-from-port": "1.1.2",
-		"@typescript-eslint/eslint-plugin": "8.33.0",
-		"@typescript-eslint/parser": "8.33.0",
+		"@typescript-eslint/eslint-plugin": "8.33.1",
+		"@typescript-eslint/parser": "8.33.1",
 		"chai": "4.5.0",
 		"eslint": "9.28.0",
-		"mocha": "11.5.0",
+		"mocha": "11.6.0",
 		"ts-node": "10.9.2",
 		"typescript": "5.8.3"
 	},
