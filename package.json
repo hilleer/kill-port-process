@@ -34,15 +34,15 @@
 	"devDependencies": {
 		"@types/chai": "4.3.17",
 		"@types/mocha": "10.0.10",
-		"@types/node": "24.3.0",
+		"@types/node": "24.10.1",
 		"@types/pid-from-port": "1.1.2",
-		"@typescript-eslint/eslint-plugin": "8.40.0",
-		"@typescript-eslint/parser": "8.40.0",
-		"chai": "4.5.0",
-		"eslint": "9.33.0",
-		"mocha": "11.7.1",
+		"@typescript-eslint/eslint-plugin": "8.47.0",
+		"@typescript-eslint/parser": "8.47.0",
+		"chai": "6.2.1",
+		"eslint": "9.39.1",
+		"mocha": "11.7.5",
 		"ts-node": "10.9.2",
-		"typescript": "5.9.2"
+		"typescript": "5.9.3"
 	},
 	"repository": {
 		"type": "git",
