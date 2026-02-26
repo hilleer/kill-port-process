@@ -1,8 +1,9 @@
 import { expect } from 'chai';
-import pidFromPort from 'pid-from-port'
 
 import { killPortProcess } from '../src/lib/index';
 import { startFakeServer } from './helpers';
+
+const importPidPort = new Function('return import("pid-port")') as () => Promise<typeof import('pid-port')>;
 
 describe('lib/index', () => {
 	describe('killPortProcess()', () => {
@@ -52,7 +53,8 @@ describe('lib/index', () => {
 				await killPortProcess(1234)
 
 				try {
-					await pidFromPort(port)
+					const { portToPid } = await importPidPort();
+					await portToPid(port)
 				} catch (error) {
 					actualError = error;
 				}
@@ -66,7 +68,7 @@ describe('lib/index', () => {
 				expect(actualError)
 					.to.be.an.instanceOf(Error)
 					.with.property('message')
-					.that.equal(`Couldn't find a process with port \`${port}\``);
+					.that.equal(`Could not find a process that uses port \`${port}\``);
 			});
 		});
 
@@ -91,7 +93,8 @@ describe('lib/index', () => {
 			before('kill port, make request', async () => {
 				await killPortProcess([5678, 6789]);
 
-				const res = await Promise.allSettled([pidFromPort(5678), pidFromPort(6789)]);
+				const { portToPid } = await importPidPort();
+				const res = await Promise.allSettled([portToPid(5678), portToPid(6789)]);
 				actualErrors = res.reduce<string[]>((acc, cur) => {
 					if (cur.status === 'rejected') {
 						acc.push(cur.reason.message);
@@ -110,8 +113,8 @@ describe('lib/index', () => {
 
 			it('should throw an error on fetch one when sending a request to the terminated server', () => {
 				const expected = [
-					"Couldn't find a process with port `5678`",
-					"Couldn't find a process with port `6789`",
+					"Could not find a process that uses port `5678`",
+					"Could not find a process that uses port `6789`",
 				];
 
 				expect(actualErrors)
@@ -164,7 +167,8 @@ describe('lib/index', () => {
 			before('kill port, make request', async () => {
 				await killPortProcess(port, { signal: 'SIGTERM' });
 				try {
-					await pidFromPort(port);
+					const { portToPid } = await importPidPort();
+					await portToPid(port);
 				} catch (error) {
 					actualPortError = error;
 				}
@@ -178,7 +182,7 @@ describe('lib/index', () => {
 				expect(actualPortError)
 					.to.be.an.instanceOf(Error)
 					.that.property('message')
-					.that.equal(`Couldn't find a process with port \`${port}\``);
+					.that.equal(`Could not find a process that uses port \`${port}\``);
 			});
 		});
 	});
