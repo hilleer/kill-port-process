@@ -1,5 +1,5 @@
 #! /usr/bin/env node
-const parse = require('get-them-args');
+import parse from 'get-them-args';
 
 import { killPortProcess, Options } from '../lib/index';
 
