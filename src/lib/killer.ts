@@ -66,6 +66,7 @@ export class Killer {
 			awk.stderr.on('data', logStderrData('awk'));
 
 			xargs.stderr.on('data', logStderrData('xargs'));
+			xargs.stdout.resume();
 			xargs.on('close', (code) => {
 				if (code !== 0) {
 					return reject();
