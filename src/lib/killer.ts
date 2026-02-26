@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 import { platform } from 'os';
-import * as pidFromPort from 'pid-from-port';
+import pidFromPort from 'pid-from-port';
 
 export type Signal = 'SIGTERM' | 'SIGKILL'
 
@@ -24,7 +24,7 @@ export class Killer {
 	}
 
 	private async win32Kill(port: number, signal: Signal, silent: boolean) {
-		const pid = await pidFromPort(port).catch((error) => {
+		const pid = await pidFromPort(port).catch((error: unknown) => {
 			if (!silent) {
 				console.error('Failed to get pid of port', port, error);
 			}
@@ -71,6 +71,7 @@ export class Killer {
 			awk.stderr.on('data', logStderrData('awk'));
 
 			xargs.stderr.on('data', logStderrData('xargs'));
+			xargs.stdout.resume();
 			xargs.on('close', (code) => {
 				if (code !== 0) {
 					return reject();
@@ -80,7 +81,7 @@ export class Killer {
 			});
 
 			function logStderrData(command: string) {
-				return (data: any) => {
+				return (data: Buffer) => {
 					if (!silent) {
 						console.error(`${command} - ${data.toString()}`);
 					}

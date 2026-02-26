@@ -8,7 +8,7 @@ const NON_EXISTENT_PORT = '59999';
 
 describe('bin/kill-port-process', () => {
 	describe('when killing process', () => {
-		before('start fake server', (done) => startFakeServer(PORT, (data: any) => done()));
+		before('start fake server', (done) => startFakeServer(PORT, (_data: Buffer) => done()));
 
 		it('should kill and return expected', async () => {
 			const actual = await killProcess();
@@ -19,7 +19,7 @@ describe('bin/kill-port-process', () => {
 	});
 
 	describe('when killing process with graceful flag', () => {
-		before('start fake server', (done) => startFakeServer(PORT, (data: any) => done()));
+		before('start fake server', (done) => startFakeServer(PORT, (_data: Buffer) => done()));
 
 		it('should kill and return expected', async () => {
 			const actual = await killProcess(['--graceful']);
@@ -53,7 +53,7 @@ function killProcess(flags: string[] = [], port: string = PORT) {
 	const child = spawn('node', args);
 
 	return new Promise((resolve, reject) => {
-		const resolveWithResult = (code: any, signal: any) => resolve({
+		const resolveWithResult = (code: number | null, signal: NodeJS.Signals | null) => resolve({
 			message: 'closed',
 			code,
 			...(signal && { signal })

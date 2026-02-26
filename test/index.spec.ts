@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import * as pidFromPort from 'pid-from-port'
+import pidFromPort from 'pid-from-port'
 
 import { killPortProcess } from '../src/lib/index';
 import { startFakeServer } from './helpers';
@@ -7,10 +7,10 @@ import { startFakeServer } from './helpers';
 describe('lib/index', () => {
 	describe('killPortProcess()', () => {
 		describe('when called with undefined', () => {
-			let actualError: any;
+			let actualError: unknown;
 			before(async () => {
 				try {
-					// @ts-ignore
+					// @ts-expect-error testing invalid input
 					await killPortProcess(undefined);
 				} catch (error) {
 					actualError = error;
@@ -22,10 +22,10 @@ describe('lib/index', () => {
 		});
 
 		describe('when called with null', () => {
-			let actualError: any;
+			let actualError: unknown;
 			before(async () => {
 				try {
-					// @ts-ignore
+					// @ts-expect-error testing invalid input
 					await killPortProcess(null);
 				} catch (error) {
 					actualError = error;
@@ -41,7 +41,7 @@ describe('lib/index', () => {
 
 			let actualListen: string;
 			let expectedListen: string;
-			before('start a fake server', (done) => startFakeServer(port, (data: any) => {
+			before('start a fake server', (done) => startFakeServer(port, (data: Buffer) => {
 				actualListen = data.toString();
 				expectedListen = 'Listening on 1234';
 				done();
@@ -73,7 +73,7 @@ describe('lib/index', () => {
 		describe('when called with multiple ports', () => {
 			let actualListenOne: string;
 			let expectedListenOne: string;
-			before('start one fake server', (done) => startFakeServer(5678, (data: any) => {
+			before('start one fake server', (done) => startFakeServer(5678, (data: Buffer) => {
 				actualListenOne = data.toString();
 				expectedListenOne = 'Listening on 5678';
 				done();
@@ -81,7 +81,7 @@ describe('lib/index', () => {
 
 			let actualListenTwo: string;
 			let expectedListenTwo: string;
-			before('start second fake server', (done) => startFakeServer(6789, (data: any) => {
+			before('start second fake server', (done) => startFakeServer(6789, (data: Buffer) => {
 				actualListenTwo = data.toString();
 				expectedListenTwo = 'Listening on 6789';
 				done();
@@ -121,12 +121,12 @@ describe('lib/index', () => {
 		});
 
 		describe('when called with a port with no process running on', () => {
-			let actualError: any;
+			let actualError: Error | undefined;
 			before('kill port', async () => {
 				try {
 					await killPortProcess(9999);
 				} catch (error) {
-					actualError = error;
+					actualError = error as Error;
 				}
 			});
 			it('should not throw an error', () => {
@@ -154,13 +154,13 @@ describe('lib/index', () => {
 			let actualListen: string;
 			let expectedListen: string;
 
-			before('start a fake server', (done) => startFakeServer(1234, (data: any) => {
+			before('start a fake server', (done) => startFakeServer(1234, (data: Buffer) => {
 				actualListen = data.toString();
 				expectedListen = 'Listening on 1234';
 				done();
 			}));
 
-			let actualPortError: any;
+			let actualPortError: unknown | undefined;
 			before('kill port, make request', async () => {
 				await killPortProcess(port, { signal: 'SIGTERM' });
 				try {
