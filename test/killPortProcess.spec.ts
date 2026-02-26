@@ -3,6 +3,8 @@ import { spawn } from 'child_process';
 
 import { startFakeServer } from './helpers';
 
+const importPidPort = new Function('return import("pid-port")') as () => Promise<typeof import('pid-port')>;
+
 const PORT = '9999';
 const NON_EXISTENT_PORT = '59999';
 
@@ -30,9 +32,22 @@ describe('bin/kill-port-process', () => {
 	});
 
 	describe('when killing process of non-existent port', () => {
-		it('should throw an error', async () => {
-			const actual = await killProcess([], NON_EXISTENT_PORT);
-			expect(actual).to.have.property('code').that.is.not.equal(0);
+		let portError: unknown;
+		before('attempt kill, verify port is not in use', async () => {
+			await killProcess([], NON_EXISTENT_PORT);
+			const { portToPid } = await importPidPort();
+			try {
+				await portToPid(Number(NON_EXISTENT_PORT));
+			} catch (error) {
+				portError = error;
+			}
+		});
+
+		it('should not have a process running on the port', () => {
+			expect(portError)
+				.to.be.instanceOf(Error)
+				.with.property('message')
+				.that.equals(`Could not find a process that uses port \`${NON_EXISTENT_PORT}\``);
 		});
 
 		it('should be silent when silent flag is set', async () => {
