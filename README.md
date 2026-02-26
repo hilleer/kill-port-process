@@ -71,10 +71,6 @@ $ kill-port --port 1234
   * **Win:** Currently no use
 * `--silent` suppresses the output of the command regardless of the result. takes a boolean, default is `false`.
 
-## Compatibility
-
-Compiled for [es5](https://compat-table.github.io/compat-table/es5) and supported by node v16 and onwards.
-
 ---
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/hilleer)
