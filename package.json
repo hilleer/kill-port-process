@@ -51,6 +51,6 @@
 		"email": "hiller@live.dk"
 	},
 	"engines": {
-		"node": ">=16"
+		"node": ">=20"
 	}
 }
