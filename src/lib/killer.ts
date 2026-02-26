@@ -65,7 +65,6 @@ export class Killer {
 			awk.stdout.pipe(xargs.stdin);
 			awk.stderr.on('data', logStderrData('awk'));
 
-			xargs.stdout.pipe(process.stdin);
 			xargs.stderr.on('data', logStderrData('xargs'));
 			xargs.on('close', (code) => {
 				if (code !== 0) {
