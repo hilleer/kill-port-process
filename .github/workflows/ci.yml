@@ -13,6 +13,7 @@ jobs:
   build:
     name: Continuous Integration
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 3
 
     strategy:
       matrix:
