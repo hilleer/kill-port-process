@@ -134,6 +134,20 @@ describe('lib/index', () => {
 			});
 		});
 
+		describe('when called with a port with no process running on and silent=true', () => {
+			let actualError: any;
+			before('kill port silently', async () => {
+				try {
+					await killPortProcess(9998, { silent: true });
+				} catch (error) {
+					actualError = error;
+				}
+			});
+			it('should not throw an error', () => {
+				expect(actualError).to.be.undefined;
+			});
+		});
+
 		describe('when called with a single port and signal=SIGTERM', () => {
 			const port = 1234;
 

@@ -4,6 +4,7 @@ import { spawn } from 'child_process';
 import { startFakeServer } from './helpers';
 
 const PORT = '9999';
+const NON_EXISTENT_PORT = '59999';
 
 describe('bin/kill-port-process', () => {
 	describe('when killing process', () => {
@@ -29,21 +30,24 @@ describe('bin/kill-port-process', () => {
 	});
 
 	describe('when killing process of non-existent port', () => {
-		it('should throw an error', () => {
-			// TODO
+		it('should throw an error', async () => {
+			const actual = await killProcess([], NON_EXISTENT_PORT);
+			expect(actual).to.have.property('code').that.is.not.equal(0);
 		});
 
 		it('should be silent when silent flag is set', async () => {
-			// TODO
+			const actual = await killProcess(['--silent'], NON_EXISTENT_PORT);
+			const expected = { message: 'closed', code: 0 };
+			expect(actual).to.deep.equal(expected);
 		});
 	});
 });
 
-function killProcess(flags: string[] = []) {
+function killProcess(flags: string[] = [], port: string = PORT) {
 	const args = [
 		'dist/bin/kill-port-process',
 		'--port',
-		PORT,
+		port,
 		...flags
 	];
 	const child = spawn('node', args);

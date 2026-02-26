@@ -21,7 +21,12 @@ import { killPortProcess, Options } from '../lib/index';
 	const flags = parseFlagsFromArgs(args);
 	const options = formatOptions(flags);
 
-	await killPortProcess(ports, options);
+	try {
+		await killPortProcess(ports, options);
+	} catch (error) {
+		console.error(error);
+		process.exit(1);
+	}
 })();
 
 type Ports = string | number | string[] | number[];

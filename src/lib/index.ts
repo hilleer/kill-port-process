@@ -22,7 +22,8 @@ export async function killPortProcess(inputPorts: Ports, inputOptions: Partial<O
 
 		const killer = new Killer(ports);
 		await killer.kill({
-			signal: options.signal
+			signal: options.signal,
+			silent: options.silent,
 		});
 	} catch (error) {
 		if (options.silent) {
