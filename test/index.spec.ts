@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import * as pidFromPort from 'pid-from-port'
+import pidFromPort from 'pid-from-port'
 
 import { killPortProcess } from '../src/lib/index';
 import { startFakeServer } from './helpers';
@@ -146,7 +146,7 @@ describe('lib/index', () => {
 				done();
 			}));
 
-			let actualPortError: Error | undefined;
+			let actualPortError: unknown | undefined;
 			before('kill port, make request', async () => {
 				await killPortProcess(port, { signal: 'SIGTERM' });
 				try {

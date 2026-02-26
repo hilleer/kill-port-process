@@ -7,5 +7,5 @@ declare module 'get-them-args' {
 		[key: string]: unknown;
 	}
 	function parse(argv?: string[]): Args;
-	export default parse;
+	export = parse;
 }

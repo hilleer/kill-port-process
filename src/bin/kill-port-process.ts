@@ -1,5 +1,6 @@
 #! /usr/bin/env node
-import parse from 'get-them-args';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import parse = require('get-them-args');
 
 import { killPortProcess, Options } from '../lib/index';
 
