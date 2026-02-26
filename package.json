@@ -39,7 +39,7 @@
 		"chai": "4.5.0",
 		"eslint": "10.0.0",
 		"mocha": "11.7.1",
-		"tsx": "4.19.0",
+		"tsx": "4.21.0",
 		"typescript": "5.9.2",
 		"typescript-eslint": "8.56.1"
 	},
