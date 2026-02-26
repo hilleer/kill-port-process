@@ -1,13 +1,13 @@
 import { Options } from '.';
 
-export function isNullOrUndefined(input: any) {
+export function isNullOrUndefined(input: unknown) {
 	if (input === undefined || input === null) {
 		return true;
 	}
 	return false;
 }
 
-export function arrayifyInput(input: any) {
+export function arrayifyInput<T>(input: T | T[]): T[] {
 	return Array.isArray(input) ? input : [input];
 }
 
