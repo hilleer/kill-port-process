@@ -1,6 +1,6 @@
 {
 	"name": "kill-port-process",
-	"version": "3.2.1",
+	"version": "4.0.0",
 	"description": "Easily kill hanging processes on ports - on any platform!",
 	"main": "dist/lib/index.js",
 	"bin": {
@@ -34,7 +34,7 @@
 		"@eslint/js": "10.0.1",
 		"@types/chai": "4.3.17",
 		"@types/mocha": "10.0.10",
-	"@types/node": "25.3.0",
+		"@types/node": "25.3.0",
 		"chai": "6.2.2",
 		"eslint": "10.0.0",
 		"mocha": "11.7.5",
