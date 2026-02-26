@@ -7,6 +7,7 @@ export type Signal = 'SIGTERM' | 'SIGKILL'
 
 type KillOptions = {
 	signal: Signal;
+	silent: boolean;
 }
 
 export class Killer {
@@ -18,12 +19,12 @@ export class Killer {
 
 	public async kill(options: KillOptions) {
 		const killFunc = platform() === 'win32' ? this.win32Kill : this.unixKill;
-		const promises = this.ports.map((port) => killFunc(port, options.signal));
+		const promises = this.ports.map((port) => killFunc(port, options.signal, options.silent));
 
 		return Promise.all(promises);
 	}
 
-	private async win32Kill(port: number, signal: Signal) {
+	private async win32Kill(port: number, _signal: Signal, silent: boolean) {
 		const { portToPid } = await importPidPort();
 		const pid = await portToPid(port).catch((error: unknown) => console.error('Failed to get pid of port', port, error));
 
@@ -33,8 +34,8 @@ export class Killer {
 
 		return new Promise((resolve, reject) => {
 			const taskkill = spawn('TASKKILL', ['/f', '/t', '/pid', pid.toString()]);
-			taskkill.stdout.on('data', (data) => console.log(data.toString()));
-			taskkill.stderr.on('data', (data) => console.error(data.toString()));
+			taskkill.stdout.on('data', (data) => { if (!silent) { console.log(data.toString()); } });
+			taskkill.stderr.on('data', (data) => { if (!silent) { console.error(data.toString()); } });
 			taskkill.on('close', (code, signal) => {
 				if (code !== 0) {
 					return reject(`taskkill process exited with code ${code} and signal ${signal}`);
@@ -46,7 +47,7 @@ export class Killer {
 		});
 	}
 
-	private async unixKill(port: number, signal: Signal) {
+	private async unixKill(port: number, signal: Signal, silent: boolean) {
 		const killCommand = {
 			SIGKILL: '-9',
 			SIGTERM: '-15'
@@ -78,7 +79,11 @@ export class Killer {
 			});
 
 			function logStderrData(command: string) {
-				return (data: Buffer) => console.error(`${command} - ${data.toString()}`);
+				return (data: Buffer) => {
+					if (!silent) {
+						console.error(`${command} - ${data.toString()}`);
+					}
+				};
 			}
 		});
 	}
