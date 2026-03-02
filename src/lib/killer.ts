@@ -26,7 +26,7 @@ export class Killer {
 
 	private async win32Kill(port: number, _signal: Signal, silent: boolean) {
 		const { portToPid } = await importPidPort();
-		const pid = await portToPid(port).catch((error: unknown) => console.error('Failed to get pid of port', port, error));
+		const pid = await portToPid({ port, host: '*' }).catch((error: unknown) => console.error('Failed to get pid of port', port, error));
 
 		if (!pid) {
 			return;
