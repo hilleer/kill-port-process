@@ -1,6 +1,6 @@
 {
 	"name": "kill-port-process",
-	"version": "4.0.0",
+	"version": "4.0.1",
 	"description": "Easily kill hanging processes on ports - on any platform!",
 	"main": "dist/lib/index.js",
 	"bin": {
@@ -28,7 +28,7 @@
 	"license": "ISC",
 	"dependencies": {
 		"get-them-args": "1.3.2",
-		"pid-port": "^1.0.2"
+		"pid-port": "1.0.2"
 	},
 	"devDependencies": {
 		"@eslint/js": "10.0.1",
