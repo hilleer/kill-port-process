@@ -26,6 +26,8 @@ export class Killer {
 
 	private async win32Kill(port: number, _signal: Signal, silent: boolean) {
 		const { portToPid } = await importPidPort();
+		// Use host: '*' to search all interfaces — pid-port v2 defaults to localhost-only,
+		// which misses servers bound to 0.0.0.0 or ::
 		const pid = await portToPid({ port, host: '*' }).catch((error: unknown) => console.error('Failed to get pid of port', port, error));
 
 		if (!pid) {
