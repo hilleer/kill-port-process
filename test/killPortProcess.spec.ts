@@ -47,7 +47,7 @@ describe('bin/kill-port-process', () => {
 			expect(portError)
 				.to.be.instanceOf(Error)
 				.with.property('message')
-				.that.equals(`Could not find a process that uses port \`${NON_EXISTENT_PORT}\``);
+				.that.equals(`Could not find a process that uses port \`${NON_EXISTENT_PORT}\` on localhost`);
 		});
 
 		it('should be silent when silent flag is set', async () => {

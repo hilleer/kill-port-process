@@ -68,7 +68,7 @@ describe('lib/index', () => {
 				expect(actualError)
 					.to.be.an.instanceOf(Error)
 					.with.property('message')
-					.that.equal(`Could not find a process that uses port \`${port}\``);
+					.that.equal(`Could not find a process that uses port \`${port}\` on localhost`);
 			});
 		});
 
@@ -113,8 +113,8 @@ describe('lib/index', () => {
 
 			it('should throw an error on fetch one when sending a request to the terminated server', () => {
 				const expected = [
-					"Could not find a process that uses port `5678`",
-					"Could not find a process that uses port `6789`",
+					"Could not find a process that uses port `5678` on localhost",
+					"Could not find a process that uses port `6789` on localhost",
 				];
 
 				expect(actualErrors)
@@ -138,7 +138,7 @@ describe('lib/index', () => {
 		});
 
 		describe('when called with a port with no process running on and silent=true', () => {
-			let actualError: any;
+			let actualError: unknown;
 			before('kill port silently', async () => {
 				try {
 					await killPortProcess(9998, { silent: true });
@@ -182,7 +182,7 @@ describe('lib/index', () => {
 				expect(actualPortError)
 					.to.be.an.instanceOf(Error)
 					.that.property('message')
-					.that.equal(`Could not find a process that uses port \`${port}\``);
+					.that.equal(`Could not find a process that uses port \`${port}\` on localhost`);
 			});
 		});
 	});
