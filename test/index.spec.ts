@@ -138,7 +138,7 @@ describe('lib/index', () => {
 		});
 
 		describe('when called with a port with no process running on and silent=true', () => {
-			let actualError: any;
+			let actualError: unknown;
 			before('kill port silently', async () => {
 				try {
 					await killPortProcess(9998, { silent: true });
