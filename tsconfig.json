@@ -1,10 +1,11 @@
 {
 	"compilerOptions": {
 		"module": "commonjs",
-		"target": "ES5",
+		"target": "ES2015",
 		"sourceMap": true,
+		"rootDir": "src",
 		"outDir": "dist",
-		"baseUrl": ".",
+		"types": ["node"],
 		"noUnusedLocals": true,
 		"strict": true,
 		"declaration": true,
