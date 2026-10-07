@@ -69,7 +69,8 @@ function ssLookup(port: number): Lookup {
 	return {
 		command: 'ss',
 		args: ['-H', '-ltnp', `sport = :${port}`],
-		parse: (output) => toPids(Array.from(output.matchAll(/pid=(\d+)/g), (match) => match[1])),
+		// anchor on the trailing `,pid=N,fd=N)` of each users:(("name",pid=N,fd=N)) entry, so a process name containing `pid=` is not matched
+		parse: (output) => toPids(Array.from(output.matchAll(/,pid=(\d+),fd=\d+\)/g), (match) => match[1])),
 	};
 }
 
@@ -81,7 +82,8 @@ function toPids(values: string[]): number[] {
 // Resolves with stdout regardless of exit code (lsof exits 1 when nothing matches)
 function run(command: string, args: string[]): Promise<string> {
 	return new Promise((resolve, reject) => {
-		const child = spawn(command, args);
+		// stderr is ignored rather than piped, so unread diagnostics cannot fill the pipe and block the command
+		const child = spawn(command, args, { stdio: ['ignore', 'pipe', 'ignore'] });
 		let stdout = '';
 
 		child.stdout.on('data', (data) => { stdout += data.toString(); });

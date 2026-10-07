@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { after, afterEach, before, describe, it } from 'node:test';
 import { chmod, mkdtemp, rm, writeFile } from 'fs/promises';
+import { ChildProcess } from 'child_process';
 import { tmpdir } from 'os';
 import { join } from 'path';
 
@@ -29,7 +30,8 @@ describe('lib/pids', function () {
 		after(() => rm(binDir, { recursive: true, force: true }));
 
 		describe('when lsof reports nothing', () => {
-			before(() => new Promise<void>((resolve) => startFakeServer(PORT, () => resolve())));
+			let server: ChildProcess;
+			before(() => new Promise<void>((resolve) => { server = startFakeServer(PORT, () => resolve()); }));
 
 			let actualPids: number[];
 			before(async () => {
@@ -41,10 +43,32 @@ describe('lib/pids', function () {
 				actualPids = await findListeningPids(PORT);
 			});
 
-			after(() => actualPids.forEach((pid) => process.kill(pid)));
+			after(() => server.kill());
 
 			it('should fall back to ss', () => {
 				assert.equal(actualPids.length, 1);
+			});
+		});
+
+		describe('when ss reports a process name containing pid=', () => {
+			let actualPids: number[];
+			before(async () => {
+				const fakeLsof = join(binDir, 'lsof');
+				await writeFile(fakeLsof, '#!/bin/sh\nexit 1\n');
+				await chmod(fakeLsof, 0o755);
+
+				const fakeSs = join(binDir, 'ss');
+				await writeFile(fakeSs, `#!/bin/sh\necho 'LISTEN 0 511 *:${PORT} *:* users:(("pid=12345",pid=67890,fd=18))'\n`);
+				await chmod(fakeSs, 0o755);
+
+				process.env.PATH = `${binDir}:${originalPath}`;
+				actualPids = await findListeningPids(PORT);
+			});
+
+			after(() => rm(join(binDir, 'ss')));
+
+			it('should only return the actual pid', () => {
+				assert.deepEqual(actualPids, [67890]);
 			});
 		});
 
