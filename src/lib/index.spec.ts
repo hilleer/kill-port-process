@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { ChildProcess } from 'node:child_process';
 import { platform } from 'node:os';
-import { before, describe, it } from 'node:test';
+import { after, before, describe, it } from 'node:test';
 
 import { killPortProcess } from './index';
 import { startFakeServer, waitForExit } from '../../test/helpers';
@@ -172,5 +172,32 @@ describe('lib/index', () => {
 				assertKilledBy(actualExit, 'SIGTERM');
 			});
 		});
+
+		for (const silent of [false, true]) {
+			describe(`when called with a valid and an invalid port and silent=${silent}`, () => {
+				const port = 4321;
+
+				let server: ChildProcess;
+				before(() => new Promise<void>((resolve) => { server = startFakeServer(port, () => resolve()); }));
+
+				let actualError: unknown;
+				before(async () => {
+					try {
+						await killPortProcess([String(port), 'abc'], { silent });
+					} catch (error) {
+						actualError = error;
+					}
+				});
+
+				after(() => server.kill());
+
+				it('should throw before killing anything', () => {
+					assert.ok(actualError instanceof Error);
+					assert.equal(actualError.message, 'Invalid port(s): "abc". Ports must be integers between 1 and 65535');
+					assert.equal(server.exitCode, null);
+					assert.equal(server.signalCode, null);
+				});
+			});
+		}
 	});
 });

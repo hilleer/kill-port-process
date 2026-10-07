@@ -6,7 +6,7 @@
 
 **Cross-platform** module to stop one (or more) process(es) running on a port (or a list of ports) with **zero dependencies**.
 
-On macOS and Linux, processes are found using `lsof`. On Linux, `ss` is used as a fallback when `lsof` is not installed or finds nothing. On Windows, processes are found using `netstat`.
+On macOS and Linux, processes listening on a TCP port are found using `lsof`. On Linux, `ss` is used as a fallback when `lsof` is not installed, fails or finds nothing. On Windows, processes are found using `netstat` and both TCP listeners and UDP bindings on the port are matched. If a lookup command is installed but fails (e.g. due to missing permissions), its error is reported rather than "No process found".
 
 ## Install
 
@@ -44,6 +44,8 @@ const { killPortProcess } = require('kill-port-process');
   * `SIGTERM`
 * `silent` (optional): suppresses the output of the command regardless of the result. takes a boolean, default is `false`.
 
+Ports must be integers (or strings of digits) between 1 and 65535. All ports are validated before any process is killed, and an invalid port is reported even when `silent` is `true`.
+
 ### CLI
 
 Install the module globally:
@@ -64,7 +66,11 @@ $ kill-port 1234 2345
 $ kill-port -p 1234
 # or
 $ kill-port --port 1234
+# or a JSON array of ports
+$ kill-port -p '[1234,2345]'
 ```
+
+`-p` and `--port` can be repeated and combined with positional ports.
 
 #### Flags
 
@@ -72,6 +78,8 @@ $ kill-port --port 1234
   * **Unix:** Sends a `-15` signal to kill (`SIGTERM`) rather than `-9` (`SIGKILL`)
   * **Win:** Currently no use
 * `--silent` suppresses the output of the command regardless of the result. takes a boolean, default is `false`.
+
+Both flags accept an optional boolean value, `--silent=false` or `--silent false`, and can be negated, `--no-silent`. Any other value following a flag is treated as a port, so `kill-port --graceful 1234` kills port `1234` gracefully.
 
 ---
 

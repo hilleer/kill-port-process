@@ -1,35 +1,72 @@
 import { spawn } from 'child_process';
 import { platform } from 'os';
 
-type Lookup = {
+export type Lookup = {
 	command: string;
 	args: string[];
 	parse: (output: string) => number[];
+	// exit codes meaning the lookup ran successfully, even if it found nothing
+	successCodes?: number[];
 }
 
+type RunResult = { code: number | null; signal: NodeJS.Signals | null; stdout: string; stderr: string };
+
+// Only the start of stderr is kept for diagnostics, the rest is read and discarded
+const MAX_STDERR_LENGTH = 1000;
+
 export async function findListeningPids(port: number): Promise<number[]> {
-	const lookups = getLookups(port);
+	return runLookups(port, getLookups(port));
+}
 
-	let anyLookupRan = false;
-	for (const { command, args, parse } of lookups) {
+// Tries each lookup in turn until one finds a process. A lookup that is not installed or fails
+// falls through to the next one; if none of them could run successfully, the collected failures are thrown.
+export async function runLookups(port: number, lookups: Lookup[]): Promise<number[]> {
+	const missing: string[] = [];
+	const failures: string[] = [];
+	let anyLookupSucceeded = false;
+
+	for (const { command, args, parse, successCodes = [0] } of lookups) {
+		let result: RunResult;
 		try {
-			const pids = parse(await run(command, args));
-			anyLookupRan = true;
-
-			if (pids.length > 0) {
-				return pids;
+			result = await run(command, args);
+		} catch (error) {
+			const { code, message } = error as NodeJS.ErrnoException;
+			if (code === 'ENOENT') {
+				missing.push(command);
+			} else {
+				failures.push(`${command} could not be started: ${message}`);
 			}
-		} catch {
-			// command not available, try the next one
+			continue;
+		}
+
+		if (result.code === null || !successCodes.includes(result.code)) {
+			failures.push(describeFailure(command, result));
+			continue;
+		}
+
+		anyLookupSucceeded = true;
+		const pids = parse(result.stdout);
+		if (pids.length > 0) {
+			return pids;
 		}
 	}
 
-	if (!anyLookupRan) {
-		const commands = lookups.map(({ command }) => command).join(' or ');
-		throw new Error(`Unable to find processes on port ${port}: install ${commands}`);
+	if (anyLookupSucceeded) {
+		return [];
 	}
 
-	return [];
+	if (failures.length === 0) {
+		throw new Error(`Unable to find processes on port ${port}: install ${missing.join(' or ')}`);
+	}
+
+	const reasons = [...failures, ...missing.map((command) => `${command} is not installed`)];
+	throw new Error(`Unable to find processes on port ${port}: ${reasons.join('; ')}`);
+}
+
+function describeFailure(command: string, { code, signal, stderr }: RunResult): string {
+	const status = code === null ? `was terminated by ${signal}` : `exited with code ${code}`;
+	const details = stderr.trim().replace(/\s+/g, ' ');
+	return details ? `${command} ${status}: ${details}` : `${command} ${status}`;
 }
 
 function getLookups(port: number): Lookup[] {
@@ -48,13 +85,36 @@ function netstatLookup(port: number): Lookup {
 	return {
 		command: 'netstat',
 		args: ['-ano'],
-		parse: (output) => toPids(output
-			.split(/\r?\n/)
-			.map((line) => line.trim().split(/\s+/))
-			// match on the remote address rather than the state column, as the state is localized
-			.filter(([, local, remote]) => local?.endsWith(`:${port}`) && /^(0\.0\.0\.0|\[::\]):0$/.test(remote))
-			.map((columns) => columns[columns.length - 1])),
+		parse: (output) => parseNetstat(output, port),
 	};
+}
+
+// Matches TCP listeners and UDP bindings on the port. Rows are identified by their remote address rather than
+// the TCP state column, as the state is localized: TCP listeners have no remote peer (0.0.0.0:0 or [::]:0)
+// and UDP rows have no state column and a *:* remote address.
+export function parseNetstat(output: string, port: number): number[] {
+	return toPids(output
+		.split(/\r?\n/)
+		.map((line) => line.trim().split(/\s+/))
+		.filter(([protocol, local, remote]) => {
+			if (getPort(local) !== port) {
+				return false;
+			}
+			switch (protocol?.toUpperCase()) {
+				case 'TCP':
+					return /^(0\.0\.0\.0|\[::\]):0$/.test(remote);
+				case 'UDP':
+					return remote === '*:*';
+				default:
+					return false;
+			}
+		})
+		.map((columns) => columns[columns.length - 1]));
+}
+
+function getPort(address: string | undefined): number | undefined {
+	const match = address?.match(/:(\d+)$/);
+	return match ? Number(match[1]) : undefined;
 }
 
 function lsofLookup(port: number): Lookup {
@@ -62,6 +122,8 @@ function lsofLookup(port: number): Lookup {
 		command: 'lsof',
 		args: ['-t', `-iTCP:${port}`, '-sTCP:LISTEN'],
 		parse: (output) => toPids(output.split(/\s+/)),
+		// lsof exits 1 when nothing matches
+		successCodes: [0, 1],
 	};
 }
 
@@ -69,25 +131,34 @@ function ssLookup(port: number): Lookup {
 	return {
 		command: 'ss',
 		args: ['-H', '-ltnp', `sport = :${port}`],
-		// anchor on the trailing `,pid=N,fd=N)` of each users:(("name",pid=N,fd=N)) entry, so a process name containing `pid=` is not matched
-		parse: (output) => toPids(Array.from(output.matchAll(/,pid=(\d+),fd=\d+\)/g), (match) => match[1])),
+		parse: parseSs,
 	};
 }
 
+// anchor on the trailing `,pid=N,fd=N)` of each users:(("name",pid=N,fd=N)) entry, so a process name containing `pid=` is not matched
+export function parseSs(output: string): number[] {
+	return toPids(Array.from(output.matchAll(/,pid=(\d+),fd=\d+\)/g), (match) => match[1]));
+}
+
 function toPids(values: string[]): number[] {
-	const pids = values.filter(Boolean).map(Number).filter((pid) => pid > 0);
+	const pids = values.filter((value) => /^\d+$/.test(value)).map(Number).filter((pid) => pid > 0);
 	return Array.from(new Set(pids));
 }
 
-// Resolves with stdout regardless of exit code (lsof exits 1 when nothing matches)
-function run(command: string, args: string[]): Promise<string> {
+function run(command: string, args: string[]): Promise<RunResult> {
 	return new Promise((resolve, reject) => {
-		// stderr is ignored rather than piped, so unread diagnostics cannot fill the pipe and block the command
-		const child = spawn(command, args, { stdio: ['ignore', 'pipe', 'ignore'] });
+		const child = spawn(command, args, { stdio: ['ignore', 'pipe', 'pipe'] });
 		let stdout = '';
+		let stderr = '';
 
 		child.stdout.on('data', (data) => { stdout += data.toString(); });
-		child.on('close', () => resolve(stdout));
+		// stderr is always read so unread diagnostics cannot fill the pipe and block the command
+		child.stderr.on('data', (data) => {
+			if (stderr.length < MAX_STDERR_LENGTH) {
+				stderr = (stderr + data.toString()).slice(0, MAX_STDERR_LENGTH);
+			}
+		});
+		child.on('close', (code, signal) => resolve({ code, signal, stdout, stderr }));
 		child.on('error', (err) => reject(err));
 	});
 }

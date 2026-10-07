@@ -1,4 +1,4 @@
-import { arrayifyInput, isNullOrUndefined, mergeOptions } from './helpers';
+import { arrayifyInput, isNullOrUndefined, mergeOptions, toPorts } from './helpers';
 import { Killer, Signal } from './killer';
 
 type Ports = number | number[] | string | string[];
@@ -15,11 +15,10 @@ export async function killPortProcess(inputPorts: Ports, inputOptions: Partial<O
 
 	const options = mergeOptions(inputOptions);
 
+	// validate every port up front, so an invalid port neither kills the valid ones first nor is hidden by silent
+	const ports = toPorts(arrayifyInput(inputPorts));
+
 	try {
-
-		const toNumber = (value: string | number) => Number(value);
-		const ports = arrayifyInput(inputPorts).map(toNumber);
-
 		const killer = new Killer(ports);
 		await killer.kill({
 			signal: options.signal,

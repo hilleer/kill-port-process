@@ -122,8 +122,47 @@ describe('CLI flag passing', () => {
 		assert.deepStrictEqual(await runCli(['--silent', '--silent=false', unusedPort]), { code: 1, signal: null, stdout: '', stderr: `No process found listening on port ${unusedPort}` });
 	});
 
+	it('reports errors with --silent false', async () => {
+		assert.deepStrictEqual(await runCli(['--silent', 'false', '-p', unusedPort]), { code: 1, signal: null, stdout: '', stderr: `No process found listening on port ${unusedPort}` });
+	});
+
+	it('reports errors when --no-silent overrides --silent', async () => {
+		assert.deepStrictEqual(await runCli(['--silent', '--no-silent', unusedPort]), { code: 1, signal: null, stdout: '', stderr: `No process found listening on port ${unusedPort}` });
+	});
+
+	it('kills every port of a JSON array', async () => {
+		const first = await startServer();
+		const second = await startServer();
+		try {
+			const result = await runCli(['-p', `[${first.port},${second.port}]`]);
+			assert.deepStrictEqual(result, { code: 0, signal: null, stdout: '', stderr: '' });
+			await withTimeout(Promise.all([first.closed, second.closed]));
+		} finally {
+			for (const server of [first, second]) {
+				if (server.child.exitCode === null && server.child.signalCode === null) {
+					server.child.kill();
+				}
+			}
+		}
+	});
+
+	if (platform() !== 'win32') {
+		it('sends SIGKILL with --no-graceful', async () => {
+			await expectKilled((port) => ['--graceful', '--no-graceful', port]);
+		});
+
+		it('sends SIGTERM with --graceful true', async () => {
+			await expectKilled((port) => ['--graceful', 'true', port], 'SIGTERM');
+		});
+	}
+
 	for (const [args, error] of [
 		[[], 'No port(s) found in provided args'],
+		[['abc'], 'Invalid port(s): "abc". Ports must be integers between 1 and 65535'],
+		[['--silent', '0'], 'Invalid port(s): "0". Ports must be integers between 1 and 65535'],
+		[['-p', '[1234,'], 'Invalid port(s): "[1234,". Ports must be integers between 1 and 65535'],
+		[['--no-silent=true', unusedPort], 'Unknown option: --no-silent=true'],
+		[['-port', unusedPort], 'Unknown option: -port'],
 		[['--port'], 'Missing port after --port'],
 		[['--port', '--silent'], 'Missing port after --port'],
 		[['-p'], 'Missing port after -p'],
