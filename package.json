@@ -7,12 +7,18 @@
 		"kill-port": "dist/bin/kill-port-process.js"
 	},
 	"types": "dist/lib/index.d.ts",
+	"files": [
+		"dist"
+	],
 	"scripts": {
-		"build": "tsc",
+		"clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
+		"prebuild": "npm run clean",
+		"build": "tsc -p tsconfig.build.json",
+		"typecheck:test": "tsc -p tsconfig.test.json",
 		"eslint": "eslint .",
 		"lint": "npm run eslint",
-		"test": "mocha test/*.spec.ts",
-		"pretest": "npm run build",
+		"test": "node --import=tsx --test \"src/**/*.spec.ts\"",
+		"pretest": "npm run build && npm run typecheck:test",
 		"preversion": "npm run build && npm test",
 		"postversion": "git push && git push --tags"
 	},
@@ -26,20 +32,12 @@
 	],
 	"author": "Daniel Hillmann",
 	"license": "ISC",
-	"dependencies": {
-		"get-them-args": "1.3.2",
-		"pid-port": "2.1.1"
-	},
 	"devDependencies": {
 		"@eslint/js": "10.0.1",
-		"@types/chai": "5.2.3",
-		"@types/mocha": "10.0.10",
 		"@types/node": "26.3.0",
-		"chai": "6.2.2",
 		"eslint": "10.9.1",
-		"mocha": "12.0.0",
 		"tsx": "4.23.12",
-		"typescript": "7.0.2",
+		"typescript": "6.0.3",
 		"typescript-eslint": "8.68.0"
 	},
 	"repository": {
@@ -51,6 +49,6 @@
 		"email": "hiller@live.dk"
 	},
 	"engines": {
-		"node": ">=20"
+		"node": ">=22"
 	}
 }

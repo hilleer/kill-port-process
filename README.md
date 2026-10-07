@@ -4,14 +4,16 @@
 [![Test](https://github.com/hilleer/kill-port-process/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hilleer/kill-port-process/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/hilleer/kill-port-process/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/hilleer/kill-port-process/actions/workflows/github-code-scanning/codeql)
 
-**Cross-platform** module to stop one (or more) process(es) running on a port (or a list of ports).
+**Cross-platform** module to stop one (or more) process(es) running on a port (or a list of ports) with **zero dependencies**.
+
+On macOS and Linux, processes are found using `lsof`. On Linux, `ss` is used as a fallback when `lsof` is not installed or finds nothing. On Windows, processes are found using `netstat`.
 
 ## Install
 
+Requires Node.js 22 or later.
+
 ```bash
 $ npm install kill-port-process
-# or
-$ yarn add kill-port-process
 ```
 
 ## Usage

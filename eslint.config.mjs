@@ -24,7 +24,7 @@ export default [
 		},
 	},
 	{
-		files: ['test/**/*.ts'],
+		files: ['src/**/*.spec.ts'],
 		rules: {
 			'@typescript-eslint/no-unused-expressions': 'off',
 		},

@@ -1,6 +1,7 @@
-import { expect } from 'chai';
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
 
-import { arrayifyInput, mergeOptions } from '../src/lib/helpers';
+import { arrayifyInput, mergeOptions } from './helpers';
 
 describe('helpers.spec.ts', () => {
 	describe('arrayifyInput()', () => {
@@ -11,7 +12,7 @@ describe('helpers.spec.ts', () => {
 				const actual = arrayifyInput(input);
 				const expected = [1234];
 
-				expect(actual).to.deep.equal(expected);
+				assert.deepStrictEqual(actual, expected);
 			});
 		});
 		describe('when input is not of type array', () => {
@@ -21,7 +22,7 @@ describe('helpers.spec.ts', () => {
 				const actual = arrayifyInput(input);
 				const expected = [1234];
 
-				expect(actual).to.deep.equal(expected);
+				assert.deepStrictEqual(actual, expected);
 			});
 		});
 	});
@@ -29,12 +30,12 @@ describe('helpers.spec.ts', () => {
 	describe('mergeOptions()', () => {
 		describe('when called with no options', () => {
 			it('should return defaults with signal=SIGKILL and silent=false', () => {
-				expect(mergeOptions({})).to.deep.equal({ signal: 'SIGKILL', silent: false });
+				assert.deepStrictEqual(mergeOptions({}), { signal: 'SIGKILL', silent: false });
 			});
 		});
 		describe('when called with silent: true', () => {
 			it('should override the silent default', () => {
-				expect(mergeOptions({ silent: true })).to.deep.equal({ signal: 'SIGKILL', silent: true });
+				assert.deepStrictEqual(mergeOptions({ silent: true }), { signal: 'SIGKILL', silent: true });
 			});
 		});
 	});

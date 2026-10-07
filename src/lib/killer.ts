@@ -1,7 +1,6 @@
 import { spawn } from 'child_process';
 import { platform } from 'os';
-
-const importPidPort = new Function('return import("pid-port")') as () => Promise<typeof import('pid-port')>;
+import { findListeningPids } from './pids';
 
 export type Signal = 'SIGTERM' | 'SIGKILL'
 
@@ -25,17 +24,16 @@ export class Killer {
 	}
 
 	private async win32Kill(port: number, _signal: Signal, silent: boolean) {
-		const { portToPid } = await importPidPort();
-		// Use host: '*' to search all interfaces — pid-port v2 defaults to localhost-only,
-		// which misses servers bound to 0.0.0.0 or ::
-		const pid = await portToPid({ port, host: '*' }).catch((error: unknown) => console.error('Failed to get pid of port', port, error));
+		const pids = await findListeningPids(port);
 
-		if (!pid) {
-			return;
+		if (pids.length === 0) {
+			throw new Error(`No process found listening on port ${port}`);
 		}
 
+		const pidArgs = pids.flatMap((pid) => ['/pid', pid.toString()]);
+
 		return new Promise((resolve, reject) => {
-			const taskkill = spawn('TASKKILL', ['/f', '/t', '/pid', pid.toString()]);
+			const taskkill = spawn('TASKKILL', ['/f', '/t', ...pidArgs]);
 			taskkill.stdout.on('data', (data) => { if (!silent) { console.log(data.toString()); } });
 			taskkill.stderr.on('data', (data) => { if (!silent) { console.error(data.toString()); } });
 			taskkill.on('close', (code, signal) => {
@@ -49,44 +47,28 @@ export class Killer {
 		});
 	}
 
-	private async unixKill(port: number, signal: Signal, silent: boolean) {
-		const killCommand = {
-			SIGKILL: '-9',
-			SIGTERM: '-15'
-		}[signal]
+	private async unixKill(port: number, signal: Signal, _silent: boolean) {
+		const pids = await findListeningPids(port);
 
-		return new Promise((resolve, reject) => {
-			const lsof = spawn('lsof', ['-i', `tcp:${port}`]);
-			const grep = spawn('grep', ['LISTEN']);
-			const awk = spawn('awk', ['{print $2}']);
-			const xargs = spawn('xargs', ['kill', killCommand]);
+		if (pids.length === 0) {
+			throw new Error(`No process found listening on port ${port}`);
+		}
 
-			lsof.stdout.pipe(grep.stdin);
-			lsof.stderr.on('data', logStderrData('lsof'));
-
-			grep.stdout.pipe(awk.stdin);
-			grep.stderr.on('data', logStderrData('grep'));
-
-			awk.stdout.pipe(xargs.stdin);
-			awk.stderr.on('data', logStderrData('awk'));
-
-			xargs.stderr.on('data', logStderrData('xargs'));
-			xargs.stdout.resume();
-			xargs.on('close', (code) => {
-				if (code !== 0) {
-					return reject();
+		const failures: string[] = [];
+		for (const pid of pids) {
+			try {
+				process.kill(pid, signal);
+			} catch (error) {
+				const { code } = error as NodeJS.ErrnoException;
+				// process exited between lookup and kill
+				if (code !== 'ESRCH') {
+					failures.push(`${pid} (${code})`);
 				}
-
-				resolve(undefined);
-			});
-
-			function logStderrData(command: string) {
-				return (data: Buffer) => {
-					if (!silent) {
-						console.error(`${command} - ${data.toString()}`);
-					}
-				};
 			}
-		});
+		}
+
+		if (failures.length > 0) {
+			throw new Error(`Failed to kill process(es) on port ${port}: ${failures.join(', ')}`);
+		}
 	}
 }

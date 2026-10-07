@@ -2,17 +2,10 @@
 	"compilerOptions": {
 		"module": "commonjs",
 		"target": "ES2020",
-		"sourceMap": true,
-		"outDir": "dist",
-		"rootDir": "src",
 		"noUnusedLocals": true,
 		"strict": true,
-		"declaration": true,
-		"declarationMap": true,
 		"esModuleInterop": true,
-		"types": ["node"]
-	},
-	"include": [
-		"src/**/*"
-	]
+		"types": ["node"],
+		"noEmit": true
+	}
 }
