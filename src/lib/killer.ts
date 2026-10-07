@@ -34,7 +34,7 @@ export class Killer {
 
 		return new Promise((resolve, reject) => {
 			const taskkill = spawn('TASKKILL', ['/f', '/t', ...pidArgs]);
-			taskkill.stdout.on('data', (data) => { if (!silent) { console.log(data.toString()); } });
+			taskkill.stdout.resume();
 			taskkill.stderr.on('data', (data) => { if (!silent) { console.error(data.toString()); } });
 			taskkill.on('close', (code, signal) => {
 				if (code !== 0) {
