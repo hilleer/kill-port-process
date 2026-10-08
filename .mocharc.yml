@@ -1,4 +1,0 @@
-timeout: 4000
-require:
-  - tsx/cjs
-exit: true
