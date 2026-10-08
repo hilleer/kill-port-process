@@ -5,8 +5,8 @@ export type Lookup = {
 	command: string;
 	args: string[];
 	parse: (output: string) => number[];
-	// exit codes meaning the lookup ran successfully, even if it found nothing
-	successCodes?: number[];
+	// a non-zero exit code meaning nothing matched, unless the command also reported an error on stderr
+	noMatchCode?: number;
 }
 
 type RunResult = { code: number | null; signal: NodeJS.Signals | null; stdout: string; stderr: string };
@@ -25,7 +25,7 @@ export async function runLookups(port: number, lookups: Lookup[]): Promise<numbe
 	const failures: string[] = [];
 	let anyLookupSucceeded = false;
 
-	for (const { command, args, parse, successCodes = [0] } of lookups) {
+	for (const { command, args, parse, noMatchCode } of lookups) {
 		let result: RunResult;
 		try {
 			result = await run(command, args);
@@ -39,7 +39,8 @@ export async function runLookups(port: number, lookups: Lookup[]): Promise<numbe
 			continue;
 		}
 
-		if (result.code === null || !successCodes.includes(result.code)) {
+		const noMatch = result.code === noMatchCode && result.stderr.trim() === '';
+		if (result.code !== 0 && !noMatch) {
 			failures.push(describeFailure(command, result));
 			continue;
 		}
@@ -122,8 +123,8 @@ function lsofLookup(port: number): Lookup {
 		command: 'lsof',
 		args: ['-t', `-iTCP:${port}`, '-sTCP:LISTEN'],
 		parse: (output) => toPids(output.split(/\s+/)),
-		// lsof exits 1 when nothing matches
-		successCodes: [0, 1],
+		// lsof exits 1 both when nothing matches and on errors; -t implies -w, so anything on stderr is an error
+		noMatchCode: 1,
 	};
 }
 

@@ -11,12 +11,12 @@ import { startFakeServer } from '../../test/helpers';
 const PORT = 7654;
 
 // A lookup running a node script, so the exit code and output of a command can be faked on any platform
-function nodeLookup(script: string, successCodes?: number[]): Lookup {
+function nodeLookup(script: string, noMatchCode?: number): Lookup {
 	return {
 		command: process.execPath,
 		args: ['-e', script],
 		parse: (output) => output.split(/\s+/).filter(Boolean).map(Number),
-		successCodes,
+		noMatchCode,
 	};
 }
 
@@ -40,12 +40,21 @@ describe('lib/pids', function () {
 			assert.deepEqual(await runLookups(PORT, [nodeLookup('process.exit(0)'), nodeLookup('console.log("123 456")')]), [123, 456]);
 		});
 
-		it('treats an accepted non-zero exit code as no match (lsof exits 1)', async () => {
-			assert.deepEqual(await runLookups(PORT, [nodeLookup('process.exit(1)', [0, 1])]), []);
+		it('treats the no-match exit code without stderr as no match (lsof exits 1)', async () => {
+			assert.deepEqual(await runLookups(PORT, [nodeLookup('process.exit(1)', 1)]), []);
+		});
+
+		it('treats the no-match exit code with stderr as a failure (lsof exits 1 on errors too)', async () => {
+			const error = await getError(runLookups(PORT, [nodeLookup('process.stderr.write("lsof: unknown TCP state name: BOGUS\\n"); process.exit(1)', 1)]));
+			assert.equal(error.message, `Unable to find processes on port ${PORT}: ${process.execPath} exited with code 1: lsof: unknown TCP state name: BOGUS`);
+		});
+
+		it('falls back past a lookup failing with the no-match exit code', async () => {
+			assert.deepEqual(await runLookups(PORT, [nodeLookup('process.stderr.write("denied"); process.exit(1)', 1), nodeLookup('console.log("789")')]), [789]);
 		});
 
 		it('falls back past a failing lookup', async () => {
-			assert.deepEqual(await runLookups(PORT, [nodeLookup('process.stderr.write("denied"); process.exit(2)', [0, 1]), nodeLookup('console.log("789")')]), [789]);
+			assert.deepEqual(await runLookups(PORT, [nodeLookup('process.stderr.write("denied"); process.exit(2)', 1), nodeLookup('console.log("789")')]), [789]);
 		});
 
 		it('falls back past a missing lookup', async () => {
@@ -53,12 +62,12 @@ describe('lib/pids', function () {
 		});
 
 		it('reports no match when one lookup succeeds and another fails', async () => {
-			assert.deepEqual(await runLookups(PORT, [nodeLookup('process.exit(1)', [0, 1]), nodeLookup('process.exit(2)')]), []);
+			assert.deepEqual(await runLookups(PORT, [nodeLookup('process.exit(1)', 1), nodeLookup('process.exit(2)')]), []);
 		});
 
 		it('throws the diagnostics of every failing lookup rather than reporting no match', async () => {
 			const error = await getError(runLookups(PORT, [
-				nodeLookup('process.stderr.write("lsof: permission denied\\n"); process.exit(2)', [0, 1]),
+				nodeLookup('process.stderr.write("lsof: permission denied\\n"); process.exit(2)', 1),
 				nodeLookup('process.stderr.write("ss: invalid option\\n"); process.exit(2)'),
 			]));
 			assert.match(error.message, new RegExp(`^Unable to find processes on port ${PORT}: `));
