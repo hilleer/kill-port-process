@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { ChildProcess } from 'node:child_process';
+import { ChildProcess, spawn } from 'node:child_process';
 import { platform } from 'node:os';
 import { after, before, describe, it } from 'node:test';
 
@@ -170,6 +170,63 @@ describe('lib/index', () => {
 
 			it('should kill the server with SIGTERM', () => {
 				assertKilledBy(actualExit, 'SIGTERM');
+			});
+		});
+
+		describe('when one process listens on several of the ports', () => {
+			const ports = [4567, 4568];
+
+			let server: ChildProcess;
+			before(() => new Promise<void>((resolve) => {
+				const script = `const http = require('http'); let listening = 0; for (const port of ${JSON.stringify(ports)}) http.createServer().listen(port, () => { if (++listening === ${ports.length}) process.stdout.write('ready'); });`;
+				server = spawn(process.execPath, ['-e', script]);
+				server.stdout?.once('data', () => resolve());
+			}));
+
+			let actualError: unknown;
+			let actualExit: Awaited<ReturnType<typeof waitForExit>>;
+			before(async () => {
+				try {
+					await killPortProcess(ports);
+				} catch (error) {
+					actualError = error;
+				}
+				actualExit = await waitForExit(server);
+			});
+
+			it('should not report a port as unused after killing its process through another port', () => {
+				assert.equal(actualError, undefined);
+			});
+
+			it('should kill the process', () => {
+				assertKilledBy(actualExit, 'SIGKILL');
+			});
+		});
+
+		describe('when called with a used and an unused port', () => {
+			const port = 4569;
+
+			let server: ChildProcess;
+			before(() => new Promise<void>((resolve) => { server = startFakeServer(port, () => resolve()); }));
+
+			let actualError: unknown;
+			let actualExit: Awaited<ReturnType<typeof waitForExit>>;
+			before(async () => {
+				try {
+					await killPortProcess([port, 9996]);
+				} catch (error) {
+					actualError = error;
+				}
+				actualExit = await waitForExit(server);
+			});
+
+			it('should kill the process on the used port', () => {
+				assertKilledBy(actualExit, 'SIGKILL');
+			});
+
+			it('should report only the unused port', () => {
+				assert.ok(actualError instanceof Error);
+				assert.equal(actualError.message, 'No process found listening on port 9996');
 			});
 		});
 

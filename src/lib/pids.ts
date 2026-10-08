@@ -18,8 +18,8 @@ export async function findListeningPids(port: number): Promise<number[]> {
 	return runLookups(port, getLookups(port));
 }
 
-// Tries each lookup in turn until one finds a process. A lookup that is not installed or fails
-// falls through to the next one; if none of them could run successfully, the collected failures are thrown.
+// Tries each lookup in turn until one finds a process. A lookup that is not installed or fails falls through
+// to the next one. Nothing found is only reported as no processes when no lookup failed, otherwise the failures are thrown.
 export async function runLookups(port: number, lookups: Lookup[]): Promise<number[]> {
 	const missing: string[] = [];
 	const failures: string[] = [];
@@ -45,14 +45,21 @@ export async function runLookups(port: number, lookups: Lookup[]): Promise<numbe
 			continue;
 		}
 
+		let pids: number[];
+		try {
+			pids = parse(result.stdout);
+		} catch (error) {
+			failures.push(`${command} ${(error as Error).message}`);
+			continue;
+		}
+
 		anyLookupSucceeded = true;
-		const pids = parse(result.stdout);
 		if (pids.length > 0) {
 			return pids;
 		}
 	}
 
-	if (anyLookupSucceeded) {
+	if (anyLookupSucceeded && failures.length === 0) {
 		return [];
 	}
 
@@ -138,7 +145,13 @@ function ssLookup(port: number): Lookup {
 
 // anchor on the trailing `,pid=N,fd=N)` of each users:(("name",pid=N,fd=N)) entry, so a process name containing `pid=` is not matched
 export function parseSs(output: string): number[] {
-	return toPids(Array.from(output.matchAll(/,pid=(\d+),fd=\d+\)/g), (match) => match[1]));
+	const pattern = /,pid=(\d+),fd=\d+\)/g;
+	// ss lists a listener without its users:((...)) column when not permitted to inspect the owning process
+	const rows = output.split(/\r?\n/).filter((row) => row.trim() !== '');
+	if (rows.some((row) => !row.match(pattern))) {
+		throw new Error('found a listener but not its process, which may belong to another user');
+	}
+	return toPids(Array.from(output.matchAll(pattern), (match) => match[1]));
 }
 
 function toPids(values: string[]): number[] {

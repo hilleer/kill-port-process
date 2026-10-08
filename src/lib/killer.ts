@@ -11,64 +11,62 @@ type KillOptions = {
 
 export class Killer {
 	protected ports: number[];
+	protected findPids: (port: number) => Promise<number[]>;
 
-	constructor(ports: number[]) {
+	constructor(ports: number[], findPids = findListeningPids) {
 		this.ports = ports;
+		this.findPids = findPids;
 	}
 
 	public async kill(options: KillOptions) {
-		const killFunc = platform() === 'win32' ? this.win32Kill : this.unixKill;
-		const promises = this.ports.map((port) => killFunc(port, options.signal, options.silent));
+		// find the processes on every port before killing any, as one process may listen on several of the ports
+		const pidsByPort = await Promise.all(this.ports.map((port) => this.findPids(port)));
+		const pids = Array.from(new Set(pidsByPort.flat()));
 
-		return Promise.all(promises);
-	}
-
-	private async win32Kill(port: number, _signal: Signal, silent: boolean) {
-		const pids = await findListeningPids(port);
-
-		if (pids.length === 0) {
-			throw new Error(`No process found listening on port ${port}`);
+		if (pids.length > 0) {
+			await (platform() === 'win32' ? win32Kill(pids, options.silent) : unixKill(pids, options.signal));
 		}
 
-		const pidArgs = pids.flatMap((pid) => ['/pid', pid.toString()]);
+		const unusedPorts = this.ports.filter((_port, index) => pidsByPort[index].length === 0);
+		if (unusedPorts.length > 0) {
+			throw new Error(`No process found listening on port${unusedPorts.length > 1 ? 's' : ''} ${unusedPorts.join(', ')}`);
+		}
+	}
+}
 
-		return new Promise((resolve, reject) => {
-			const taskkill = spawn('TASKKILL', ['/f', '/t', ...pidArgs]);
-			taskkill.stdout.resume();
-			taskkill.stderr.on('data', (data) => { if (!silent) { console.error(data.toString()); } });
-			taskkill.on('close', (code, signal) => {
-				if (code !== 0) {
-					return reject(`taskkill process exited with code ${code} and signal ${signal}`);
-				}
+function win32Kill(pids: number[], silent: boolean) {
+	const pidArgs = pids.flatMap((pid) => ['/pid', pid.toString()]);
 
-				resolve(undefined);
-			});
-			taskkill.on('error', (err) => reject(err));
+	return new Promise((resolve, reject) => {
+		const taskkill = spawn('TASKKILL', ['/f', '/t', ...pidArgs]);
+		taskkill.stdout.resume();
+		taskkill.stderr.on('data', (data) => { if (!silent) { console.error(data.toString()); } });
+		taskkill.on('close', (code, signal) => {
+			if (code !== 0) {
+				return reject(`taskkill process exited with code ${code} and signal ${signal}`);
+			}
+
+			resolve(undefined);
 		});
-	}
+		taskkill.on('error', (err) => reject(err));
+	});
+}
 
-	private async unixKill(port: number, signal: Signal, _silent: boolean) {
-		const pids = await findListeningPids(port);
-
-		if (pids.length === 0) {
-			throw new Error(`No process found listening on port ${port}`);
-		}
-
-		const failures: string[] = [];
-		for (const pid of pids) {
-			try {
-				process.kill(pid, signal);
-			} catch (error) {
-				const { code } = error as NodeJS.ErrnoException;
-				// process exited between lookup and kill
-				if (code !== 'ESRCH') {
-					failures.push(`${pid} (${code})`);
-				}
+function unixKill(pids: number[], signal: Signal) {
+	const failures: string[] = [];
+	for (const pid of pids) {
+		try {
+			process.kill(pid, signal);
+		} catch (error) {
+			const { code } = error as NodeJS.ErrnoException;
+			// process exited between lookup and kill
+			if (code !== 'ESRCH') {
+				failures.push(`${pid} (${code})`);
 			}
 		}
+	}
 
-		if (failures.length > 0) {
-			throw new Error(`Failed to kill process(es) on port ${port}: ${failures.join(', ')}`);
-		}
+	if (failures.length > 0) {
+		throw new Error(`Failed to kill process(es): ${failures.join(', ')}`);
 	}
 }

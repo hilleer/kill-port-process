@@ -61,8 +61,19 @@ describe('lib/pids', function () {
 			assert.deepEqual(await runLookups(PORT, [missingLookup('kpp-missing-lsof'), nodeLookup('console.log("789")')]), [789]);
 		});
 
-		it('reports no match when one lookup succeeds and another fails', async () => {
-			assert.deepEqual(await runLookups(PORT, [nodeLookup('process.exit(1)', 1), nodeLookup('process.exit(2)')]), []);
+		it('throws the failure when one lookup finds nothing and another fails', async () => {
+			const error = await getError(runLookups(PORT, [nodeLookup('process.exit(1)', 1), nodeLookup('process.stderr.write("invalid option"); process.exit(2)')]));
+			assert.equal(error.message, `Unable to find processes on port ${PORT}: ${process.execPath} exited with code 2: invalid option`);
+		});
+
+		it('reports no match when one lookup finds nothing and another is not installed', async () => {
+			assert.deepEqual(await runLookups(PORT, [nodeLookup('process.exit(1)', 1), missingLookup('kpp-missing-ss')]), []);
+		});
+
+		it('throws when a lookup cannot parse its output', async () => {
+			const lookup: Lookup = { ...nodeLookup('console.log("busy")'), parse: () => { throw new Error('found a listener but not its process'); } };
+			const error = await getError(runLookups(PORT, [nodeLookup('process.exit(1)', 1), lookup]));
+			assert.equal(error.message, `Unable to find processes on port ${PORT}: ${process.execPath} found a listener but not its process`);
 		});
 
 		it('throws the diagnostics of every failing lookup rather than reporting no match', async () => {
@@ -156,6 +167,19 @@ describe('lib/pids', function () {
 			assert.deepEqual(parseSs(output), [111, 222]);
 		});
 
+		it('returns nothing when there is no listener', () => {
+			assert.deepEqual(parseSs(''), []);
+		});
+
+		it('throws when a listener is listed without its process', () => {
+			assert.throws(() => parseSs(`LISTEN 0 511 *:${PORT} *:*\n`), { message: 'found a listener but not its process, which may belong to another user' });
+		});
+
+		it('throws when only some listeners are listed with their process', () => {
+			const output = `LISTEN 0 511 0.0.0.0:${PORT} 0.0.0.0:* users:(("node",pid=111,fd=18))\nLISTEN 0 511 [::]:${PORT} [::]:*\n`;
+			assert.throws(() => parseSs(output), { message: 'found a listener but not its process, which may belong to another user' });
+		});
+
 		it('ignores a process name containing pid=', () => {
 			assert.deepEqual(parseSs(`LISTEN 0 511 *:${PORT} *:* users:(("pid=12345",pid=67890,fd=18))`), [67890]);
 		});
@@ -219,6 +243,33 @@ describe('lib/pids', function () {
 
 			it('should only return the actual pid', () => {
 				assert.deepEqual(actualPids, [67890]);
+			});
+		});
+
+		describe('when ss lists the listener without its process', () => {
+			let actualError: unknown;
+			before(async () => {
+				const fakeLsof = join(binDir, 'lsof');
+				await writeFile(fakeLsof, '#!/bin/sh\nexit 1\n');
+				await chmod(fakeLsof, 0o755);
+
+				const fakeSs = join(binDir, 'ss');
+				await writeFile(fakeSs, `#!/bin/sh\necho 'LISTEN 0 511 *:${PORT} *:*'\n`);
+				await chmod(fakeSs, 0o755);
+
+				process.env.PATH = `${binDir}:${originalPath}`;
+				try {
+					await findListeningPids(PORT);
+				} catch (error) {
+					actualError = error;
+				}
+			});
+
+			after(() => rm(join(binDir, 'ss')));
+
+			it('should report the hidden process rather than no process', () => {
+				assert.ok(actualError instanceof Error);
+				assert.equal(actualError.message, `Unable to find processes on port ${PORT}: ss found a listener but not its process, which may belong to another user`);
 			});
 		});
 
